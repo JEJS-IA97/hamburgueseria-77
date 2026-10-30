@@ -1,0 +1,3 @@
+import { supabase } from '../lib/supabase';import type { CartLine } from '../store/cart';
+export type Customer={name:string;phone:string;rut:string;mode:'delivery'|'pickup'|'table';address:string;table_number:string;notes:string};
+export async function createOrder(customer:Customer,lines:CartLine[]){if(!supabase)throw new Error('Pedidos deshabilitados: conecta Supabase antes de publicar.');const {data,error}=await supabase.rpc('create_order',{p_customer:customer,p_items:lines.map(l=>({... (l.promotion_id?{promotion_id:l.promotion_id}:{dish_id:l.dish.id}),quantity:l.qty,extras:l.extras}))});if(error)throw error;return data as {id:string;number:number;total_clp:number}}

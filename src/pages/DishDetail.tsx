@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Check, Minus, Plus, Share2 } from 'lucide-react';
+import { ArrowLeft, Check, ChevronRight, Minus, Plus, Share2 } from 'lucide-react';
+import { FoodIcon } from '../components/ui/FoodIcon';
 import { getDishes } from '../api/catalog';
 import { imageUrl, type Dish } from '../data';
 import { formatCLP, formatDishPrice } from '../lib';
@@ -11,6 +12,7 @@ export function DishDetail() {
   const [dish, setDish] = useState<Dish>();
   const [extras, setExtras] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
   const add = useCart((state) => state.add);
 
   useEffect(() => {
@@ -34,9 +36,9 @@ export function DishDetail() {
 
   if (!dish) {
     return (
-      <main className="container section dish-detail">
-        <Link to="/#menu" className="dish-back-link"><ArrowLeft size={18} /> Volver al menú</Link>
-        <h1>Plato no encontrado</h1>
+      <main className="container page">
+        <Link to="/#menu" className="back-link"><ArrowLeft size={18} /> Volver al menú</Link>
+        <h1 className="display">Plato no encontrado</h1>
       </main>
     );
   }
@@ -62,40 +64,56 @@ export function DishDetail() {
   const addToCart = () => {
     if (!canAdd) return;
     for (let index = 0; index < quantity; index += 1) add(dish, extras);
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 1600);
   };
+
+  const categoryHref = `/categoria/${dish.category.normalize('NFD').replace(/[̀-ͯ]/g, '').toLocaleLowerCase('es').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+  const extrasCount = extras.filter(name => !isIncluded(name)).length;
 
   return (
     <main className="dish-detail">
       <div className="dish-detail-layout">
-        <section className="dish-detail-visual" aria-label={`Fotografía de ${dish.name}`}>
-          {dish.image ? (
-            <img src={imageUrl(dish.image, 1200)} alt={dish.name} />
-          ) : (
-            <div className="dish-detail-placeholder" aria-hidden="true">🍔</div>
-          )}
-          <Link to="/#menu" className="dish-floating-button dish-back-button" aria-label="Volver al menú">
-            <ArrowLeft size={20} />
-          </Link>
-          <button className="dish-floating-button dish-share-button" type="button" onClick={shareDish} aria-label="Compartir plato">
+        <section className="dish-detail-visual" aria-label={dish.image ? `Fotografía de ${dish.name}` : undefined}>
+          {dish.image
+            ? <img src={imageUrl(dish.image, 1200)} alt={dish.name} />
+            : <div className="dish-detail-plate" aria-hidden="true">
+                <span className="dish-detail-plate__ring" />
+                <FoodIcon category={dish.category} size={120} strokeWidth={1.25} />
+              </div>}
+          <button className="icon-btn icon-btn--float dish-share-button" type="button" onClick={shareDish} aria-label="Compartir plato">
             <Share2 size={19} />
           </button>
         </section>
 
         <div className="dish-detail-content">
           <header className="dish-detail-heading">
-            <p className="dish-detail-eyebrow">{dish.category}{dish.size && ` · ${dish.size}`}</p>
-            <h1>{dish.name}</h1>
-            <p className="dish-detail-ingredients">
-              {[...dish.ingredients, ...(dish.components ?? [])].join(' · ')}
-            </p>
-            <strong className="dish-detail-price">{formatDishPrice(dish)}</strong>
+            <div className="dish-detail-top">
+              <nav className="dish-detail-crumbs" aria-label="Ruta">
+                <Link to="/#menu"><ArrowLeft size={16} aria-hidden="true" /> Menú</Link><ChevronRight size={14} aria-hidden="true" /><Link to={categoryHref}>{dish.category}</Link>
+              </nav>
+            </div>
+            <div className="dish-detail-title">
+              <h1 className="display">{dish.name}</h1>
+            </div>
+            {dish.size && <span className="pill dish-detail-size">{dish.size}</span>}
+            <strong className="dish-detail-price num">{formatDishPrice(dish)}</strong>
+            {dish.description && <p className="dish-detail-description">{dish.description}</p>}
           </header>
 
           {dish.price_clp == null && dish.price_min_clp != null && (
             <p className="dish-detail-note">La carta publica un rango. Confirma el precio exacto con el local para activar pedidos de este producto.</p>
           )}
-          {dish.description && <p className="dish-detail-description">{dish.description}</p>}
           {dish.payment_conditions && <p className="dish-detail-note">{dish.payment_conditions}</p>}
+
+          {dish.ingredients.length > 0 && (
+            <section className="dish-detail-section">
+              <h2>Lleva</h2>
+              <ul className="dish-ingredient-chips">
+                {dish.ingredients.map((ingredient) => <li key={ingredient}>{ingredient}</li>)}
+              </ul>
+            </section>
+          )}
 
           {dish.components && dish.components.length > 0 && (
             <section className="dish-detail-section">
@@ -110,7 +128,9 @@ export function DishDetail() {
             <section className="dish-detail-section">
               <div className="dish-options-heading">
                 <h2>{includedLimit ? 'Elige tus ingredientes' : 'Agrega extras'}</h2>
-                {includedLimit > 0 && <span>{selectedIncluded} de {includedLimit}</span>}
+                {includedLimit > 0
+                  ? <span>{selectedIncluded} de {includedLimit}</span>
+                  : extrasCount > 0 && <span>{extrasCount} {extrasCount === 1 ? 'extra' : 'extras'}</span>}
               </div>
               <div className="dish-extra-grid">
                 {dish.extras.map((extra) => {
@@ -118,16 +138,16 @@ export function DishDetail() {
                   const included = isIncluded(extra.name);
                   const limitReached = included && includedLimit > 0 && selectedIncluded >= includedLimit;
                   return (
-                    <label className={`dish-extra-card${checked ? ' is-selected' : ''}`} key={extra.name}>
+                    <label className={`dish-extra${checked ? ' is-selected' : ''}`} key={extra.name}>
                       <input
                         type="checkbox"
                         checked={checked}
                         disabled={!checked && limitReached}
                         onChange={(event) => toggleExtra(extra.name, event.target.checked)}
                       />
-                      <span className="dish-extra-name">{extra.name}</span>
-                      <span className="dish-extra-price">{included ? 'Incluido' : `+${formatCLP(extra.price_clp)}`}</span>
-                      <span className="dish-extra-mark" aria-hidden="true">{checked ? <Check size={17} /> : <Plus size={17} />}</span>
+                      <span className="dish-extra__mark" aria-hidden="true">{checked ? <Check size={16} strokeWidth={3} /> : <Plus size={16} strokeWidth={2.5} />}</span>
+                      <span className="dish-extra__name">{extra.name}</span>
+                      <span className="dish-extra__price">{included ? 'Incluido' : `+${formatCLP(extra.price_clp)}`}</span>
                     </label>
                   );
                 })}
@@ -135,17 +155,8 @@ export function DishDetail() {
             </section>
           )}
 
-          {dish.ingredients.length > 0 && (
-            <section className="dish-detail-section dish-ingredients-section">
-              <h2>Ingredientes</h2>
-              <ul className="dish-ingredient-chips">
-                {dish.ingredients.map((ingredient) => <li key={ingredient}>{ingredient}</li>)}
-              </ul>
-            </section>
-          )}
-
           <div className="dish-purchase-bar">
-            <div className="dish-quantity" aria-label="Cantidad">
+            <div className="stepper" role="group" aria-label="Cantidad">
               <button type="button" aria-label="Restar una unidad" disabled={quantity === 1} onClick={() => setQuantity((value) => Math.max(1, value - 1))}>
                 <Minus size={18} />
               </button>
@@ -154,9 +165,9 @@ export function DishDetail() {
                 <Plus size={18} />
               </button>
             </div>
-            <button className="dish-purchase-button" type="button" disabled={!canAdd} onClick={addToCart}>
-              <span>Agregar al carrito</span>
-              <strong>{unitPrice == null ? formatDishPrice(dish) : formatCLP(unitPrice * quantity)}</strong>
+            <button className="btn btn-primary btn-split dish-purchase-button" type="button" disabled={!canAdd} onClick={addToCart}>
+              <span>{added ? 'Agregado al carrito' : 'Agregar al carrito'}</span>
+              <strong>{added ? <Check size={20} /> : unitPrice == null ? formatDishPrice(dish) : formatCLP(unitPrice * quantity)}</strong>
             </button>
           </div>
         </div>

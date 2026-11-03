@@ -1,0 +1,272 @@
+/* Tokens, reset y controles comunes. Ver AGENTS.md §2–§5.
+   Tema claro/oscuro con html[data-theme]. Ningún componente escribe colores, radios o márgenes a mano. */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
+
+:root {
+  --orange: #f15a24;
+  --orange-strong: #c9441a;
+  --yellow: #ffc629;
+  --ink: #111210;              /* negro cálido: hero, pie, botón fuerte */
+
+  --bg: #f6f4ef;
+  --surface: #ffffff;
+  --surface-2: #eceae4;
+  --text: #191919;
+  --text-muted: #5f5e5a;
+  --line: #dedbd3;
+  --accent: var(--orange);
+  --accent-text: var(--orange-strong);   /* naranja como texto sobre claro (AA) */
+  --on-accent: #ffffff;
+  --strong: var(--ink);                   /* botón negro (blanco en oscuro) */
+  --on-strong: #ffffff;
+  --danger: #b42318;
+  --success: #1f7a4d;
+
+  --font-display: 'Barlow Condensed', system-ui, sans-serif;
+  --font-ui: 'DM Sans', system-ui, sans-serif;
+  --radius: 14px;
+  --radius-card: 20px;
+  --radius-lg: 28px;
+  --radius-pill: 999px;
+  --gutter: clamp(18px, 3vw, 56px);
+  --section-gap: clamp(40px, 5vw, 64px);
+  --max: 1440px;
+  --header-h: 68px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow: 0 12px 32px -14px rgb(20 18 14 / 0.22);
+  --shadow-sm: 0 2px 10px -4px rgb(20 18 14 / 0.14);
+  color-scheme: light;
+}
+
+html[data-theme='dark'] {
+  --bg: #111210;
+  --surface: #1b1c19;
+  --surface-2: #262723;
+  --text: #f7f6f1;
+  --text-muted: #b2b0a8;
+  --line: #34352f;
+  --accent: #ff6a2a;
+  --accent-text: #ff8a55;
+  --on-accent: #1a0d06;
+  --strong: #f7f6f1;
+  --on-strong: #111210;
+  --shadow: 0 16px 40px -16px rgb(0 0 0 / 0.7);
+  --shadow-sm: 0 2px 10px -4px rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}
+
+@media (max-width: 767px) {
+  :root { --header-h: 60px; }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--header-h) + 16px); }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0;
+  min-width: 320px;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s, color 0.25s;
+}
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+::selection { background: var(--accent); color: var(--on-accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+/* ── Utilidades ─────────────────────────────────────────── */
+.container { width: 100%; max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
+.section { padding-top: var(--section-gap); }
+.display { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.01em; line-height: 0.95; text-transform: uppercase; }
+.display em { font-style: normal; color: var(--accent); }
+.muted { color: var(--text-muted); }
+.num { font-variant-numeric: tabular-nums; }
+.truncate { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; min-width: 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.empty-state {
+  margin: 0;
+  padding: 24px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-card);
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+/* Cabecera de sección: título a la izquierda, «Ver todo» a la derecha (ref-7). */
+.section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.section-head h2 { font-size: clamp(30px, 4vw, 48px); }
+.section-head__link {
+  display: inline-flex; align-items: center; gap: 4px; flex: none;
+  min-height: 44px; font-size: 14px; font-weight: 600; color: var(--accent-text);
+}
+.section-head__link:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+/* ── Botones ────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 48px; padding: 0 22px;
+  border: 1px solid transparent; border-radius: var(--radius-pill);
+  background: none; font-size: 15px; font-weight: 700; white-space: nowrap;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s, transform 0.2s var(--ease-out);
+}
+.btn:active:not(:disabled) { transform: scale(0.98); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--accent); color: var(--on-accent); }
+.btn-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 86%, #000); }
+.btn-strong { background: var(--strong); color: var(--on-strong); }
+.btn-strong:hover:not(:disabled) { background: color-mix(in srgb, var(--strong) 82%, var(--accent)); }
+.btn-outline { border-color: var(--line); background: var(--surface); }
+.btn-outline:hover:not(:disabled) { border-color: var(--text); }
+.btn-danger { border-color: var(--line); background: var(--surface); color: var(--danger); }
+.btn-danger:hover:not(:disabled) { border-color: var(--danger); }
+.btn-sm { min-height: 40px; padding: 0 16px; font-size: 14px; }
+.btn-block { width: 100%; }
+/* Botón con el precio dentro: «Agregar al carrito   $10.990» */
+.btn-split { justify-content: space-between; padding-inline: 24px; }
+.btn-split strong { font-variant-numeric: tabular-nums; }
+
+.icon-btn {
+  display: grid; place-items: center; flex: none;
+  width: 44px; height: 44px; padding: 0;
+  border: 0; border-radius: 50%; background: none; color: var(--text);
+  transition: background-color 0.2s, color 0.2s;
+}
+.icon-btn:hover { background: var(--surface-2); }
+.icon-btn--float { background: var(--surface); box-shadow: var(--shadow-sm); }
+
+/* Botón redondo naranja de «+» (tarjetas, extras) */
+.add-btn {
+  display: grid; place-items: center; flex: none;
+  width: 40px; height: 40px; padding: 0;
+  border: 0; border-radius: 50%; background: var(--accent); color: var(--on-accent);
+  transition: transform 0.2s var(--ease-out), background-color 0.2s;
+}
+.add-btn:hover { transform: scale(1.08); }
+.add-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* ── Formularios ────────────────────────────────────────── */
+.form { display: grid; gap: 18px; }
+.form-row { display: grid; gap: 18px; }
+@media (min-width: 600px) { .form-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.form-card {
+  display: grid; gap: 18px;
+  padding: clamp(18px, 2.5vw, 28px);
+  border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface);
+}
+.form-card > h2 { font-size: 22px; font-family: var(--font-ui); font-weight: 700; }
+
+.field { display: grid; gap: 6px; align-content: start; }
+.field > span { font-size: 14px; font-weight: 600; }
+.field small { font-size: 13px; color: var(--text-muted); }
+.field .field__error { color: var(--danger); font-weight: 600; }
+
+.input {
+  width: 100%; min-height: 48px; padding: 10px 14px;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.4;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input::placeholder { color: color-mix(in srgb, var(--text-muted) 75%, transparent); }
+.input:hover { border-color: var(--text-muted); }
+.input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+.input[aria-invalid='true'] { border-color: var(--danger); }
+textarea.input { min-height: 104px; resize: vertical; }
+input[type='number'].input { -moz-appearance: textfield; }
+input[type='number'].input::-webkit-inner-spin-button,
+input[type='number'].input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type='date'].input { min-height: 48px; }
+
+/* Buscador con icono a la izquierda */
+.search-input { position: relative; display: block; }
+.search-input svg { position: absolute; left: 16px; top: 50%; translate: 0 -50%; color: var(--text-muted); pointer-events: none; }
+.search-input .input { padding-left: 46px; border-radius: var(--radius-pill); }
+
+/* Select: misma caja que .input, flecha propia que gira al abrir. Componente: components/ui/Select.tsx */
+.select { position: relative; display: block; }
+.select > select.input { width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.select select { appearance: none; -webkit-appearance: none; padding-right: 44px; cursor: pointer; }
+.select__chevron {
+  position: absolute; right: 14px; top: 50%; translate: 0 -50%; pointer-events: none;
+  color: var(--text-muted); transition: rotate 0.25s var(--ease-out), color 0.2s;
+}
+.select:hover .select__chevron { color: var(--text); }
+.select:has(select:focus-visible) .select__chevron { color: var(--accent); }
+.select:has(select:open) .select__chevron { rotate: 180deg; color: var(--accent); }
+select.input option { background: var(--bg); color: var(--text); }
+@supports (appearance: base-select) {
+  .select select, .select select::picker(select) { appearance: base-select; }
+  .select select::picker-icon { display: none; }
+  .select select::picker(select) {
+    /* Abre hacia abajo; hacia arriba solo si no cabe. */
+    position-area: block-end span-inline-end; position-try-order: normal; position-try-fallbacks: flip-block;
+    margin-top: 6px; padding: 6px;
+    border: 1px solid var(--line); border-radius: var(--radius);
+    background: var(--surface); color: var(--text); box-shadow: var(--shadow);
+    opacity: 0; translate: 0 -6px;
+    transition: opacity 0.18s var(--ease-out), translate 0.18s var(--ease-out), display 0.18s allow-discrete, overlay 0.18s allow-discrete;
+  }
+  .select select:open::picker(select) { opacity: 1; translate: 0 0; }
+  @starting-style { .select select:open::picker(select) { opacity: 0; translate: 0 -6px; } }
+  .select select option {
+    display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 8px 12px;
+    border-radius: calc(var(--radius) - 4px); background: transparent; font-size: 15px; cursor: pointer;
+  }
+  .select select option::checkmark { order: 1; margin-left: auto; color: var(--accent); }
+  .select select option:hover, .select select option:focus-visible { background: var(--surface-2); outline: none; }
+  .select select option:checked { color: var(--accent-text); font-weight: 700; background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+}
+
+/* Opciones de una sola elección en pastillas (entrega) */
+.choices { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.choices legend { width: 100%; margin-bottom: 8px; padding: 0; font-size: 14px; font-weight: 600; }
+.choices label {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px; padding: 0 16px;
+  border: 1px solid var(--line); border-radius: var(--radius-pill); background: var(--bg);
+  font-size: 15px; cursor: pointer; transition: border-color 0.2s, background-color 0.2s;
+}
+.choices label:hover { border-color: var(--text-muted); }
+.choices label:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--bg)); font-weight: 700; }
+.choices input { margin: 0; accent-color: var(--accent); }
+
+/* Casilla en fila entera clicable */
+.check { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 15px; font-weight: 600; cursor: pointer; }
+.check input { width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
+
+/* Cantidad − 1 + en pastilla */
+.stepper {
+  display: inline-flex; align-items: center; flex: none;
+  border: 1px solid var(--line); border-radius: var(--radius-pill); background: var(--surface);
+}
+.stepper button {
+  display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+  border: 0; border-radius: 50%; background: none;
+}
+.stepper button:hover:not(:disabled) { background: var(--surface-2); }
+.stepper button:disabled { opacity: 0.35; cursor: not-allowed; }
+.stepper span { min-width: 28px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stepper--sm button { width: 36px; height: 36px; }
+
+.alert { padding: 12px 14px; border-radius: var(--radius); font-size: 14px; background: color-mix(in srgb, var(--danger) 10%, var(--surface)); color: var(--danger); }
+.notice { padding: 12px 14px; border-radius: var(--radius); font-size: 14px; background: var(--surface-2); color: var(--text-muted); }
+.notice--ok { background: color-mix(in srgb, var(--success) 12%, var(--surface)); color: var(--success); }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: var(--radius-pill);
+  background: var(--surface-2); color: var(--text);
+  font-size: 12px; font-weight: 700; line-height: 1.3; white-space: nowrap;
+}
+.pill--accent { background: var(--accent); color: var(--on-accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

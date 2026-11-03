@@ -1,0 +1,133 @@
+/* Panel /admin. Ver AGENTS.md §8. */
+.admin { min-height: 100dvh; background: var(--bg); }
+.admin__bar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 8px var(--gutter); background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.admin__bar .brand img { width: 40px; height: 40px; border-radius: 10px; }
+.admin__bar .brand span { font-size: 20px; }
+.admin__bar nav { display: flex; gap: 4px; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.admin__bar nav a {
+  position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px;
+  font-size: 15px; font-weight: 600; color: var(--text-muted); white-space: nowrap; transition: color 0.2s;
+}
+.admin__bar nav a:hover { color: var(--text); }
+/* Activa: texto en color de marca con subrayado, sin pastilla (mismo patrón que el header de la tienda). */
+.admin__bar nav a.active { color: var(--accent-text); }
+.admin__bar nav a.active::after { content: ''; position: absolute; left: 12px; right: 12px; bottom: 6px; height: 2px; border-radius: 1px; background: var(--accent); }
+@media (max-width: 640px) {
+  .admin__bar nav { order: 3; flex-basis: 100%; }
+  .admin__bar .btn { margin-left: auto; }
+}
+
+.admin__body { max-width: 1040px; margin: 0 auto; padding: 28px var(--gutter) 64px; }
+.admin__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.admin__head h1 { font-size: 28px; font-weight: 700; }
+.admin__head p { font-size: 15px; }
+.admin__filter { width: 220px; }
+.admin-section { margin-bottom: 24px; }
+
+.admin-center { min-height: 100dvh; display: grid; place-items: center; padding: var(--gutter); }
+/* Login: foto de la marca a la izquierda (mismo fondo que el hero) y formulario a la derecha. En móvil solo el formulario. */
+.login-page { display: grid; min-height: 100dvh; background: var(--bg); }
+@media (min-width: 900px) { .login-page { grid-template-columns: minmax(0, 1fr) minmax(420px, 560px); } }
+.login-page__brand { position: relative; isolation: isolate; overflow: hidden; display: none; align-items: flex-end; padding: clamp(32px, 4vw, 56px); background: var(--ink); color: #fff; }
+@media (min-width: 900px) { .login-page__brand { display: flex; } }
+.login-page__bg { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; }
+.login-page__brand::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgb(10 10 9 / 0.25) 0%, rgb(10 10 9 / 0.85) 70%, rgb(10 10 9 / 0.95) 100%); }
+.login-page__brand-copy { display: grid; gap: 14px; max-width: 440px; }
+.login-page__brand-copy img { width: 88px; height: 88px; border-radius: 20px; object-fit: cover; background: #000; }
+.login-page__brand-copy .display { font-size: clamp(48px, 5vw, 72px); }
+.login-page__brand-copy p:last-child { font-size: 17px; color: #dcd9d1; }
+
+.login-page__form { position: relative; display: grid; align-content: center; justify-items: center; gap: 24px; padding: 24px var(--gutter) 48px; }
+.login-page__form > .back-link { justify-self: start; }
+@media (min-width: 900px) { .login-page__form { padding-inline: clamp(32px, 4vw, 64px); } .login-page__form > .back-link { position: absolute; top: 24px; left: clamp(32px, 4vw, 64px); } }
+.login { display: grid; gap: 18px; width: min(400px, 100%); }
+.login__logo { width: 56px; height: 56px; border-radius: 14px; object-fit: cover; background: #000; }
+@media (min-width: 900px) { .login__logo { display: none; } }
+.login__head { display: grid; gap: 8px; }
+.login__head h1 { font-size: clamp(44px, 5vw, 56px); }
+.login__head p { font-size: 15px; }
+.login__password { position: relative; display: block; }
+.login__password .input { padding-right: 52px; }
+.login__password .icon-btn { position: absolute; right: 2px; top: 50%; translate: 0 -50%; color: var(--text-muted); }
+.login__submit { min-height: 52px; margin-top: 4px; }
+.spin { animation: spin 0.9s linear infinite; }
+@keyframes spin { to { rotate: 360deg; } }
+
+/* Filtros: buscador + categoría. */
+.admin-filters { display: grid; gap: 10px; margin-bottom: 10px; }
+@media (min-width: 720px) { .admin-filters { grid-template-columns: minmax(0, 1fr) 260px; } }
+.admin-count { margin-bottom: 8px; font-size: 13px; }
+
+/* Listas en filas de grid */
+.admin-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.admin-list--scroll {
+  max-height: min(64vh, 680px); overflow-y: auto; overscroll-behavior: contain; padding-right: 4px;
+  scrollbar-width: thin; scrollbar-color: var(--line) transparent;
+}
+.admin-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px;
+  min-height: 64px; padding: 10px 14px;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface);
+}
+.admin-row:hover { border-color: var(--text-muted); }
+.admin-row--dish { grid-template-columns: 48px minmax(0, 1fr) auto auto auto; }
+.admin-row--promo { grid-template-columns: minmax(0, 1fr) auto auto; }
+.admin-row__thumb { width: 48px; height: 48px; overflow: hidden; border-radius: 10px; background: var(--surface-2); }
+.admin-row__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.admin-row__main { display: grid; gap: 2px; min-width: 0; }
+.admin-row__main b { font-size: 15px; }
+.admin-row__main small { font-size: 13px; color: var(--text-muted); }
+.admin-row__price { font-size: 15px; white-space: nowrap; }
+.admin-row__actions { display: flex; gap: 2px; }
+.admin-danger { color: var(--danger); }
+@media (max-width: 560px) {
+  .admin-row--dish { grid-template-columns: 48px minmax(0, 1fr) auto; }
+  .admin-row--dish .admin-row__state, .admin-row--dish .admin-row__price { display: none; }
+  .admin-row--promo { grid-template-columns: minmax(0, 1fr) auto; }
+  .admin-row--promo .admin-row__price { display: none; }
+}
+
+/* Estados de pedido: fondo claro + texto oscuro, igual en ambos temas. */
+.pill--ok, .pill--entregado { background: #dcf3e6; color: #135c38; }
+.pill--nuevo { background: #d9eff9; color: #0a5677; }
+.pill--confirmado, .pill--preparando { background: #fff1c7; color: #6b4e00; }
+.pill--listo { background: #e6e0fa; color: #43308a; }
+.pill--cancelado { background: #fde3e1; color: #8c1d14; }
+.pill { text-transform: capitalize; }
+
+/* Pedidos */
+.orders { display: grid; gap: 10px; }
+.order { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.order[open] { border-color: var(--text-muted); }
+.order summary {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px;
+  min-height: 60px; padding: 12px 16px; cursor: pointer; list-style: none;
+}
+.order summary::-webkit-details-marker { display: none; }
+.order summary time { margin-left: auto; font-size: 13px; }
+.order__body { display: grid; gap: 16px; padding: 16px; border-top: 1px solid var(--line); }
+.order__data { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0; font-size: 15px; }
+.order__data dt { font-weight: 700; }
+.order__data dd { margin: 0; }
+.order__data a { color: var(--accent-text); font-weight: 600; }
+.order__items { display: grid; margin: 0; padding: 0; list-style: none; }
+.order__items li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+.order__items li > span:first-child { display: grid; gap: 2px; justify-items: start; }
+.order__items small { font-size: 13px; color: var(--text-muted); }
+.order__status { max-width: 240px; }
+
+/* Diálogo de edición */
+.admin-dialog {
+  width: min(680px, calc(100vw - 24px)); max-height: calc(100dvh - 24px);
+  padding: clamp(18px, 3vw, 28px); border: 0; border-radius: var(--radius-card);
+  background: var(--surface); color: var(--text); box-shadow: var(--shadow);
+}
+.admin-dialog::backdrop { background: rgb(8 10 14 / 0.55); }
+.admin-dialog__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.admin-dialog__head h2 { font-size: 24px; font-weight: 700; }
+.admin-dialog .input { background: var(--bg); }
+.admin-dialog__actions { display: flex; flex-wrap: wrap; gap: 10px; }

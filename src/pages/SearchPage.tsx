@@ -15,9 +15,14 @@ export function SearchPage() {
     return menu.filter(dish => dish.available && `${dish.name} ${dish.category} ${dish.description} ${dish.ingredients.join(' ')}`.toLocaleLowerCase('es').includes(term));
   }, [menu, query]);
 
-  return <main className="search-page">
-    <Link to="/" className="back-link"><ArrowLeft size={17} /> Volver al menú</Link>
-    <div className="search-page-heading"><span className="catalog-eyebrow">RESULTADOS DEL MENÚ</span><h1>Buscaste <em>“{query}”</em></h1><p>{results.length} {results.length === 1 ? 'resultado' : 'resultados'}</p></div>
-    {results.length ? <div className="search-results-grid">{results.map(dish => <DishCard key={dish.id} dish={dish} />)}</div> : <p className="empty-state">No encontramos platos con ese nombre. Prueba con otro término.</p>}
+  return <main className="container page">
+    <Link to="/#menu" className="back-link"><ArrowLeft size={18} /> Volver al menú</Link>
+    <header className="page-head">
+      <h1 className="display">Buscaste <em>“{query}”</em></h1>
+      <p className="muted">{results.length} {results.length === 1 ? 'resultado' : 'resultados'}</p>
+    </header>
+    {results.length
+      ? <div className="grid">{results.map(dish => <DishCard key={dish.id} dish={dish} />)}</div>
+      : <p className="empty-state">No encontramos platos con ese nombre. Prueba con otro término.</p>}
   </main>;
 }

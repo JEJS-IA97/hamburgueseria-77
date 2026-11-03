@@ -1,0 +1,205 @@
+/* Inicio: hero, categorías, carruseles, promociones y ubicación. Ver AGENTS.md §11.4, §11.5, §11.10. */
+
+/* ── Hero oscuro con la hamburguesa flotando (diseño original del local) ── */
+.hero {
+  position: relative; isolation: isolate; overflow: hidden;
+  background: var(--ink); color: #fff;
+}
+.hero__bg { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; object-position: 50% 60%; }
+/* Velo sobre la foto de fondo: texto legible a la izquierda, brillo naranja detrás de la hamburguesa. */
+.hero::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  background:
+    radial-gradient(ellipse at 72% 50%, rgb(241 90 36 / 0.22) 0%, transparent 50%),
+    linear-gradient(90deg, rgb(10 10 9 / 0.92) 0%, rgb(10 10 9 / 0.78) 45%, rgb(10 10 9 / 0.55) 100%);
+}
+@media (max-width: 899px) {
+  .hero::before { background: linear-gradient(180deg, rgb(10 10 9 / 0.55) 0%, rgb(10 10 9 / 0.85) 55%, rgb(10 10 9 / 0.95) 100%); }
+}
+.hero__inner {
+  display: grid; align-items: center; gap: 32px;
+  min-height: clamp(520px, 66vh, 640px); padding-block: clamp(40px, 6vw, 72px);
+}
+@media (min-width: 900px) { .hero__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.hero__copy { display: grid; gap: 18px; justify-items: start; max-width: 560px; }
+.hero h1 { font-size: clamp(60px, 9vw, 120px); line-height: 0.86; }
+.hero h1 em { color: var(--yellow); }
+.hero__copy > p { max-width: 42ch; font-size: 18px; color: #dcd9d1; }
+.hero__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.hero__ghost { border-color: rgb(255 255 255 / 0.35); color: #fff; }
+.hero__ghost:hover { border-color: #fff; background: rgb(255 255 255 / 0.08); }
+.hero__location { display: flex; align-items: flex-start; gap: 8px; margin-top: 8px; font-size: 14px !important; color: #bdb9b0 !important; }
+.hero__location svg { flex: none; margin-top: 2px; color: var(--yellow); }
+
+.hero__visual { position: relative; width: min(100%, 520px); aspect-ratio: 1 / 0.9; justify-self: center; }
+.hero__photo {
+  position: absolute; inset: 4% 2% 5% 7%; overflow: hidden;
+  border-radius: 47% 47% 42% 42% / 39% 39% 45% 45%;
+  box-shadow: 0 28px 60px rgb(0 0 0 / 0.55), 0 0 0 9px rgb(255 255 255 / 0.03);
+}
+.hero__photo img { width: 100%; height: 100%; object-fit: cover; }
+.hero__photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgb(16 15 14 / 0.4)); }
+.hero__orbit { position: absolute; inset: 0; border: 1px solid rgb(255 198 41 / 0.32); border-radius: 50%; transform: rotate(-14deg) scaleX(0.86); }
+.hero__orbit--two { inset: 8% -4% 3% 8%; border-color: rgb(241 90 36 / 0.45); transform: rotate(22deg) scaleX(0.9); }
+.hero__sticker {
+  position: absolute; right: -2%; top: 6%;
+  display: grid; place-items: center; align-content: center; gap: 2px;
+  width: 104px; height: 104px; border-radius: 50%;
+  background: var(--yellow); color: #141414; text-align: center; line-height: 1;
+  transform: rotate(8deg); box-shadow: 0 12px 25px rgb(0 0 0 / 0.35);
+}
+.hero__sticker span { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; }
+.hero__sticker b { font-family: var(--font-display); font-size: 24px; font-weight: 800; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero__photo { animation: burger-float 6s ease-in-out infinite; }
+  .hero__orbit { animation: orbit-turn 24s linear infinite; }
+  .hero__orbit--two { animation-duration: 31s; animation-direction: reverse; }
+  .hero__copy { animation: hero-in 0.75s var(--ease-out) both; }
+  .hero__visual { animation: hero-in 0.9s 0.12s var(--ease-out) both; }
+}
+@keyframes burger-float { 0%, 100% { translate: 0 0; rotate: 0deg; } 50% { translate: 0 -14px; rotate: -1.5deg; } }
+@keyframes orbit-turn { to { rotate: 360deg; } }
+@keyframes hero-in { from { opacity: 0; translate: 0 18px; } }
+
+@media (max-width: 899px) {
+  .hero__inner { min-height: 0; padding-block: 28px 40px; }
+  .hero__visual { order: -1; width: min(86%, 380px); }
+  .hero h1 { font-size: clamp(56px, 17vw, 88px); }
+  .hero__copy > p { font-size: 16px; }
+  .hero__sticker { width: 84px; height: 84px; }
+  .hero__sticker b { font-size: 20px; }
+}
+
+/* ── Categorías en círculos (ref-1, ref-7) ────────────────── */
+.menu-intro .section-head { margin-bottom: 12px; }
+.category-nav {
+  display: flex; gap: clamp(12px, 2vw, 24px);
+  /* Sin scroll-snap: las categorías llegan después y el snap dejaba la fila pegada al final. */
+  overflow-x: auto; scrollbar-width: none;
+  padding: 6px 2px 8px; margin-inline: -2px;
+}
+.category-nav::-webkit-scrollbar { display: none; }
+.category-nav__item { flex: none; display: grid; justify-items: center; align-content: start; gap: 8px; width: 84px; }
+.category-nav__icon {
+  display: grid; place-items: center; width: 72px; height: 72px; overflow: hidden;
+  border-radius: 50%; background: var(--surface); color: var(--accent-text);
+  box-shadow: 0 0 0 1px var(--line);
+  transition: box-shadow 0.2s, transform 0.3s var(--ease-out), background-color 0.2s, color 0.2s;
+}
+.category-nav__icon--promo { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+.category-nav__item:hover .category-nav__icon { transform: translateY(-2px); background: var(--accent); color: #fff; box-shadow: 0 0 0 1px var(--accent); }
+.category-nav__label { max-width: 100%; font-size: 14px; font-weight: 600; text-align: center; line-height: 1.25; }
+
+/* ── Carrusel ──────────────────────────────────────────────── */
+.carousel { position: relative; }
+.carousel__track {
+  display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 16px) / 2.15); gap: 16px;
+  overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none;
+  padding: 4px 2px 12px; margin-inline: -2px;
+}
+.carousel__track::-webkit-scrollbar { display: none; }
+@media (min-width: 768px) { .carousel__track { grid-auto-columns: calc((100% - 48px) / 3.3); gap: 20px; } }
+@media (min-width: 1100px) { .carousel__track { grid-auto-columns: calc((100% - 80px) / 5); } }
+.carousel__item { min-width: 0; scroll-snap-align: start; }
+/* Flechas a los lados, centradas en la fila; solo con ratón (en táctil se desliza). */
+.carousel__nav {
+  position: absolute; inset: 0 -22px 12px; display: none; align-items: center; justify-content: space-between;
+  pointer-events: none;
+}
+.carousel__nav .icon-btn { pointer-events: auto; opacity: 0; transition: opacity 0.2s, background-color 0.2s; }
+.carousel:hover .carousel__nav .icon-btn, .carousel__nav .icon-btn:focus-visible { opacity: 1; }
+@media (hover: hover) and (min-width: 768px) { .carousel__nav { display: flex; } }
+
+/* Promos: un poco más anchas que un plato. Todas del mismo alto; lo que no cabe se trunca. */
+.carousel--promos .carousel__track { grid-auto-columns: calc((100% - 16px) / 1.25); }
+@media (min-width: 768px) { .carousel--promos .carousel__track { grid-auto-columns: calc((100% - 40px) / 2.4); } }
+@media (min-width: 1100px) { .carousel--promos .carousel__track { grid-auto-columns: calc((100% - 60px) / 3.5); } }
+
+/* ── Tarjeta de combo: misma familia que la de plato (blanca, sombra suave, «+» naranja),
+      con talón de ticket: línea perforada y muescas antes del precio. ─────────────────── */
+.promo-card {
+  --notch: 11px;
+  position: relative;
+  display: flex; flex-direction: column; gap: 12px;
+  height: 320px; padding: 18px 18px 0;
+  border-radius: var(--radius-card); background: var(--surface); box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.3s, transform 0.3s var(--ease-out);
+}
+.promo-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+html[data-theme='dark'] .promo-card { box-shadow: inset 0 0 0 1px var(--line); }
+
+.promo-card__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.promo-card__tag {
+  padding: 5px 12px; border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface)); color: var(--accent-text);
+  font-size: 13px; font-weight: 700;
+}
+.promo-card--weekly .promo-card__tag { background: var(--yellow); color: #171717; }
+.promo-card__icon {
+  display: grid; place-items: center; width: 40px; height: 40px; flex: none;
+  border-radius: 50%; background: var(--surface-2); color: var(--accent-text);
+}
+
+.promo-card__title {
+  font-family: var(--font-display); font-weight: 800; text-transform: uppercase;
+  font-size: 30px; line-height: 0.98; letter-spacing: -0.005em;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: none;
+}
+
+.promo-card__items { display: grid; gap: 6px; align-content: start; min-height: 0; overflow: hidden; margin: 0; padding: 0; list-style: none; }
+.promo-card__items li:nth-child(n + 3) { display: none; }
+.promo-card__items li { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; padding-left: 24px; position: relative; font-size: 14px; line-height: 1.45; color: var(--text-muted); }
+.promo-card__items svg { position: absolute; left: 0; top: 3px; color: var(--accent); }
+
+.promo-card__pay { flex: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text-muted); }
+.promo-card__pay svg { flex: none; }
+
+/* Talón: perforación + muescas con el color del fondo de la página. */
+.promo-card__foot {
+  position: relative;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 76px; margin: auto -18px 0; padding: 14px 18px 16px;
+  border-top: 2px dashed var(--line);
+}
+.promo-card__foot::before, .promo-card__foot::after {
+  content: ''; position: absolute; top: calc(var(--notch) * -1 - 1px);
+  width: calc(var(--notch) * 2); height: calc(var(--notch) * 2); border-radius: 50%; background: var(--bg);
+}
+.promo-card__foot::before { left: calc(var(--notch) * -1); }
+.promo-card__foot::after { right: calc(var(--notch) * -1); }
+.promo-card__price { font-family: var(--font-display); font-size: 36px; font-weight: 800; line-height: 1; color: var(--accent-text); }
+.promo-card__add { width: 48px; height: 48px; }
+
+/* ── Ubicación: foto del local de fondo y tarjeta «Ubícanos» con el mapa encima ── */
+.location {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: grid; align-items: center; gap: 24px;
+  min-height: clamp(380px, 36vw, 480px); padding: clamp(24px, 4vw, 48px);
+  border-radius: var(--radius-lg); background: var(--ink); color: #fff;
+}
+@media (min-width: 900px) { .location { grid-template-columns: minmax(0, 1fr) minmax(320px, 420px); } }
+.location__img { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; }
+.location::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(90deg, rgb(10 10 9 / 0.9) 0%, rgb(10 10 9 / 0.65) 45%, rgb(10 10 9 / 0.25) 100%);
+}
+.location__copy { display: grid; gap: 12px; justify-items: start; max-width: 520px; }
+.location h2 { font-size: clamp(40px, 5vw, 64px); }
+.location__copy p { display: flex; align-items: flex-start; gap: 8px; font-size: 16px; color: #dcd9d1; }
+.location__copy p svg { flex: none; margin-top: 3px; color: var(--yellow); }
+
+.location__card {
+  display: grid; gap: 0; overflow: hidden;
+  border-radius: var(--radius-card); background: var(--surface); color: var(--text);
+  box-shadow: 0 24px 48px -16px rgb(0 0 0 / 0.6);
+}
+.location__map { position: relative; aspect-ratio: 16 / 10; background: var(--surface-2); }
+.location__map iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.location__card .btn { margin: 12px; }
+
+@media (max-width: 899px) {
+  .location { align-content: end; min-height: 0; padding: clamp(180px, 46vw, 260px) 16px 16px; }
+  .location::before { background: linear-gradient(180deg, rgb(10 10 9 / 0.1) 0%, rgb(10 10 9 / 0.75) 45%, rgb(10 10 9 / 0.95) 100%); }
+  .location__img { object-position: 30% 50%; }
+}

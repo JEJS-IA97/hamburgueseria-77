@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowDown, ArrowRight, ArrowUpRight, MapPin } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, MapPin } from 'lucide-react';
 import { type Dish } from '../data';
 import { getDishes } from '../api/catalog';
 import { CategoryNav, CategorySection } from '../components/menu/CategorySection';
@@ -42,29 +42,59 @@ export function Home() {
 
   return <main>
     <section className="hero" id="inicio">
-      <div className="hero-content">
-        <div className="hero-kicker"><span /> HAMBURGUESAS · PIZZAS · MÁS</div>
-        <h1>EL ANTOJO<br />TIENE <em>77</em></h1>
-        <p>Tu próxima comida favorita está a un pedido de distancia.</p>
-        <a className="hero-cta" href="#menu">VER EL MENÚ <ArrowRight size={17} /></a>
-        <div className="hero-location"><MapPin size={15} /> {address}</div>
+      <img className="hero__bg" src="/images/hero-festin-callejero.png" alt="" fetchPriority="high" />
+      <div className="container hero__inner">
+        <div className="hero__copy">
+          <h1 className="display">¿Hambre en<br /><em>Labranza?</em></h1>
+          <p>Lo tenemos todo para matarte el antojo.</p>
+          <div className="hero__actions">
+            <a className="btn btn-primary" href="#menu">Ver el menú <ArrowRight size={18} /></a>
+            <a className="btn hero__ghost" href="#promos">Promociones</a>
+          </div>
+          <p className="hero__location"><MapPin size={16} /> {address}</p>
+        </div>
+        <div className="hero__visual" aria-hidden="true">
+          <div className="hero__orbit" />
+          <div className="hero__orbit hero__orbit--two" />
+          <div className="hero__photo">
+            <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1000&q=85" alt="" fetchPriority="high" />
+          </div>
+          <div className="hero__sticker"><span>¿HAMBRE?</span><b>Resuelta.</b></div>
+        </div>
       </div>
-      <div className="hero-visual"><div className="hero-orbit orbit-one" /><div className="hero-orbit orbit-two" /><div className="hero-photo" /><div className="hero-sticker"><span>HAMBRE?</span><b>Resuelta.</b><ArrowDown size={14} /></div></div>
-      <a className="hero-scroll" href="#categorias">DESLIZA PARA DESCUBRIR <ArrowDown size={13} /></a>
     </section>
 
-    <CategoryNav categories={categoryLinks} />
+    <div className="container" id="menu">
+      <div className="section menu-intro">
+        <div className="section-head">
+          <h2 className="display">Encuentra tu <em>antojo</em></h2>
+        </div>
+        <CategoryNav categories={categoryLinks} />
+      </div>
 
-    <div className="menu-page" id="menu">
       {homeCategoryLinks.map(({ name, anchor }) => {
         const dishes = catalogDishes.filter(dish => normalize(dish.category) === normalize(name));
         return <CategorySection key={name} name={name} anchor={anchor} dishes={dishes} />;
       })}
-      {available.length === 0 && <p className="empty-state">No hay platos disponibles para mostrar.</p>}
+      {available.length === 0 && <p className="empty-state section">No hay platos disponibles para mostrar.</p>}
 
       <PromotionSection promotions={promotions} />
-    </div>
 
-    <section className="location-section" id="ubicacion"><div className="location-copy"><span className="hero-kicker">UBICACIÓN</span><h2>Labranza,<br /><em>Chile.</em></h2><p>{address}</p></div><a className="location-card" href={mapsUrl} target="_blank" rel="noreferrer" aria-label={`Abrir ${address}, Labranza en Google Maps`}><span className="location-pin"><MapPin size={18} /></span><span>ENCUÉNTRANOS EN</span><b>Hamburguesería 77 <ArrowUpRight size={17} aria-hidden="true" /></b><small>{address}</small><span className="location-map-cta">ABRIR EN MAPS <ArrowUpRight size={13} aria-hidden="true" /></span></a></section>
+      <section className="section" id="ubicacion" aria-labelledby="ubicacion-title">
+        <div className="location">
+          <img className="location__img" src="/images/location.jpg" alt="Fachada de Hamburguesería 77" loading="lazy" />
+          <div className="location__copy">
+            <h2 className="display" id="ubicacion-title">Estamos en <em>Labranza</em></h2>
+            <p><MapPin size={18} />{address}</p>
+          </div>
+          <div className="location__card">
+            <div className="location__map">
+              <iframe title="Mapa de Hamburguesería 77" src={`https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+            </div>
+            <a className="btn btn-primary" href={mapsUrl} target="_blank" rel="noreferrer"><MapPin size={18} /> Ubícanos <ArrowUpRight size={18} /></a>
+          </div>
+        </div>
+      </section>
+    </div>
   </main>;
 }

@@ -11,12 +11,13 @@ export const formatDishPrice = (dish: { price_clp: number | null; price_min_clp?
 export type Theme = 'light' | 'dark';
 
 export function getInitialTheme(): Theme {
-  const saved = localStorage.getItem('h77-theme');
+  let saved: string | null = null;
+  try { saved = localStorage.getItem('h77-theme'); } catch { /* modo privado */ }
   if (saved === 'dark' || saved === 'light') return saved;
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 export function applyTheme(theme: Theme) {
   document.documentElement.dataset.theme = theme;
-  localStorage.setItem('h77-theme', theme);
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#111210' : '#f6f4ef');
 }

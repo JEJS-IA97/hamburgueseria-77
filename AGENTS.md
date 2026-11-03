@@ -8,6 +8,23 @@ Idioma de la interfaz y de los comentarios: español. Moneda CLP.
 
 ---
 
+> **Estado 2026-11-03:** la reorganización de §10 (pasos 1–9) ya está hecha. Los estilos viven en `src/styles/base.css` (tokens y controles), `components/layout/layout.css`, `components/menu/menu.css`, `components/product/product.css`, `pages/pages.css` y `admin/admin.css`. `styles.css`, `refinements.css` y `structure.css` se borraron: **no recrearlos**. Todo `<select>` usa `components/ui/Select.tsx`. Para cambiar algo, edita la regla existente en su archivo; reutiliza `.btn`, `.input`, `.field`, `.form-card`, `.choices`, `.stepper`, `.pill`, `.add-btn`, `.icon-btn`, `.section-head` antes de crear clases nuevas. La tabla de §1 describe el estado anterior.
+>
+> **Reglas de José (2026-11-03), mandan sobre todo lo demás:**
+> - **Nunca fotos genéricas que no correspondan al producto** (nada de hamburguesas en sándwiches, completos, churrascos o pollo). Sin foto real del plato → icono de `components/ui/FoodIcon.tsx` o solo texto. Promos y categorías van sin foto.
+> - El botón del carrito es **naranja en ambos modos**; no usar `--strong` (se invierte con el tema) en elementos de marca.
+> - El hero lleva **las dos cosas**: foto de fondo `public/images/hero-festin-callejero.png` con velo oscuro **y** encima la hamburguesa con su animación (flotar + órbitas + sticker «¿Hambre? Resuelta.»). No quitar ninguna.
+> - Ubicación: **foto del local (`public/images/location.jpg`) de fondo** y encima una tarjeta con el **mapa de Google** y el botón **«Ubícanos»**. No quitar ni la foto ni el mapa.
+> - Combos: tarjeta tipo ticket de la misma familia que la de plato (blanca, título Barlow, lista «✓», talón perforado con precio y «+»). `contentOf()` en `PromotionSection.tsx` quita las repeticiones de la base de datos; no mostrar descripción y componentes a la vez.
+> - Pie: estructura de LM Perfumes (llamada a pedir, marca + 3 columnas en acordeón móvil, línea legal). No reducirlo a dirección + lista.
+> - **Todas las tarjetas de un mismo tipo miden lo mismo**, tengan el contenido que tengan. Lo que no cabe se trunca con «…» (`line-clamp`) y el texto completo va en `title`. Tarjeta de combo: alto fijo 320 px, título máx. 2 líneas, máx. 2 ítems de 2 líneas, pago en 1 línea.
+> - Ficha del plato: **siempre dos columnas con el cuadro de imagen a la izquierda** (foto real o placa oscura con el icono). El cuadro no es sticky y la ficha termina con aire propio: **el cuadro nunca toca el footer**.
+> - Al cambiar de página se empieza arriba (`StoreLayout` hace scroll a 0 salvo que haya `#ancla`).
+> - Carrito = panel lateral igual al de LM Perfumes (`components/cart/CartDrawer.tsx`): se abre con el botón del header y al agregar algo; desde ahí «Continuar con el pedido» lleva a `/checkout`. Totales con `lineTotal`/`cartTotal` de `store/cart.ts`.
+> - Navegación activa (tienda y admin): **texto en color + subrayado**, nunca pastilla rellena.
+> - Redes oficiales: Instagram `https://www.instagram.com/lahamburgueseria77` y Facebook `https://www.facebook.com/people/Hamburgueser%C3%ADa-Labranza/100063806342442/` (constantes en `StoreLayout.tsx`).
+> - No eliminar ni rediseñar algo que ya existe sin que José lo pida.
+
 ## 0. Reglas de trabajo (leer primero)
 
 1. **No minificar el código fuente.** Hoy `styles.css`, `refinements.css`, `structure.css` y varios `.tsx` están escritos en una sola línea. Así no se puede revisar ni corregir. Una regla por línea en CSS (o propiedades en pocas líneas legibles), JSX con saltos de línea normales. Vite ya minifica al compilar.

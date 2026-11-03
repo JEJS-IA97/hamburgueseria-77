@@ -1,0 +1,7 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "h77", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev", "--", "--port", "5177"], "port": 5177 },
+    { "name": "perfumes", "runtimeExecutable": "node", "runtimeArgs": ["../lm-perfumes/apps/web/node_modules/vite/bin/vite.js", "../lm-perfumes/apps/web", "--port", "5180", "--strictPort"], "port": 5180 }
+  ]
+}

@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { formatCLP } from '../lib';
+import { Select } from '../components/ui/Select';
 
 type OrderItem = {
   name: string;
@@ -13,9 +14,12 @@ type OrderItem = {
   line_total_clp?: number;
 };
 
+const statuses = ['nuevo', 'confirmado', 'preparando', 'listo', 'entregado', 'cancelado'];
+
 export function OrdersPage() {
   const [rows, setRows] = useState<any[]>([]);
   const [error, setError] = useState('');
+  const [filter, setFilter] = useState('');
 
   useEffect(() => {
     supabase?.from('orders').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
@@ -31,27 +35,63 @@ export function OrdersPage() {
     else setRows(current => current.map(order => order.id === id ? { ...order, status: value } : order));
   }
 
-  return <section className="admin-content">
-    <h1>Pedidos</h1><p>Órdenes recibidas</p>{error && <p className="alert">{error}</p>}
-    <div className="admin-list">{rows.map(order => {
-      const items = Array.isArray(order.items) ? order.items as OrderItem[] : [];
-      return <article className="admin-row order-row" key={order.id}>
-        <div className="admin-dish">
-          <small>#{order.order_number} · {new Date(order.created_at).toLocaleString('es-CL')}</small>
-          <b>{order.customer_name} · {order.customer_phone}</b>
-          <span>{order.mode === 'delivery' ? order.address : order.mode === 'table' ? `Mesa ${order.table_number}` : 'Retiro'} · RUT {order.customer_rut}</span>
-          <div className="order-items">{items.map((item, index) => <div className="order-item" key={`${item.name}-${index}`}>
-            <b>{item.quantity} × {item.name}{item.size ? ` · ${item.size}` : ''}</b>
-            {item.item_type === 'combo' && <strong className="combo-label">COMBO</strong>}
-            {item.item_type === 'combo' && item.components?.length ? <small>Incluye: {item.components.join(' · ')}</small> : null}
-            {item.item_type === 'combo' && item.description ? <small>{item.description}</small> : null}
-            {item.extras?.length ? <small>Extras: {item.extras.join(' · ')}</small> : null}
-            {item.line_total_clp != null && <small>{formatCLP(item.line_total_clp)}</small>}
-          </div>)}</div>
+  const visible = useMemo(() => filter ? rows.filter(order => order.status === filter) : rows, [rows, filter]);
+
+  return (
+    <section>
+      <div className="admin__head">
+        <div>
+          <h1>Pedidos</h1>
+          <p className="muted">{visible.length} {visible.length === 1 ? 'orden' : 'órdenes'}</p>
         </div>
-        <strong>{formatCLP(order.total_clp)}</strong>
-        <select value={order.status} onChange={event => status(order.id, event.target.value)}>{['nuevo', 'confirmado', 'preparando', 'listo', 'entregado', 'cancelado'].map(value => <option key={value}>{value}</option>)}</select>
-      </article>;
-    })}</div>
-  </section>;
+        <Select className="admin__filter" value={filter} onChange={event => setFilter(event.target.value)} aria-label="Filtrar por estado">
+          <option value="">Todos los estados</option>
+          {statuses.map(value => <option key={value} value={value}>{value}</option>)}
+        </Select>
+      </div>
+      {error && <p className="alert">{error}</p>}
+      {visible.length === 0 && <p className="empty-state">No hay pedidos.</p>}
+      <div className="orders">
+        {visible.map(order => {
+          const items = Array.isArray(order.items) ? order.items as OrderItem[] : [];
+          return (
+            <details className="order" key={order.id}>
+              <summary>
+                <b>#{order.order_number}</b>
+                <span>{order.customer_name}</span>
+                <span className={`pill pill--${order.status}`}>{order.status}</span>
+                <strong className="num">{formatCLP(order.total_clp)}</strong>
+                <time className="muted">{new Date(order.created_at).toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' })}</time>
+              </summary>
+              <div className="order__body">
+                <dl className="order__data">
+                  <dt>Teléfono</dt><dd><a href={`tel:${order.customer_phone}`}>{order.customer_phone}</a></dd>
+                  <dt>RUT</dt><dd>{order.customer_rut}</dd>
+                  <dt>Entrega</dt><dd>{order.mode === 'delivery' ? order.address : order.mode === 'table' ? `Mesa ${order.table_number}` : 'Retiro en local'}</dd>
+                  {order.notes && <><dt>Notas</dt><dd>{order.notes}</dd></>}
+                </dl>
+                <ul className="order__items">
+                  {items.map((item, index) => <li key={`${item.name}-${index}`}>
+                    <span>
+                      <b>{item.quantity} × {item.name}{item.size ? ` · ${item.size}` : ''}</b>
+                      {item.item_type === 'combo' && <span className="pill">Combo</span>}
+                      {item.item_type === 'combo' && item.components?.length ? <small>Incluye: {item.components.join(' · ')}</small> : null}
+                      {item.extras?.length ? <small>Extras: {item.extras.join(' · ')}</small> : null}
+                    </span>
+                    {item.line_total_clp != null && <span className="num">{formatCLP(item.line_total_clp)}</span>}
+                  </li>)}
+                </ul>
+                <label className="field order__status">
+                  <span>Estado</span>
+                  <Select value={order.status} onChange={event => status(order.id, event.target.value)}>
+                    {statuses.map(value => <option key={value} value={value}>{value}</option>)}
+                  </Select>
+                </label>
+              </div>
+            </details>
+          );
+        })}
+      </div>
+    </section>
+  );
 }

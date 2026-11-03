@@ -1,0 +1,141 @@
+/* Páginas: categoría, búsqueda, ficha del plato, checkout y confirmación. Ver AGENTS.md §11.6–§11.9. */
+.page { padding-top: clamp(16px, 2.5vw, 28px); }
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px;
+  font-size: 15px; font-weight: 600; color: var(--text-muted);
+}
+.back-link:hover { color: var(--text); }
+.page-head { display: grid; gap: 6px; margin: 8px 0 28px; }
+.page-head h1 { font-size: clamp(44px, 7vw, 88px); }
+
+/* ── Ficha del plato (ref-7 centro + ref-2 centro) ─────────────────────────────
+   Izquierda: el «plato» (foto real o placa oscura de la marca con el icono). Derecha: datos y compra.
+   El bloque termina con aire propio antes del pie: la foto nunca toca el footer. */
+.dish-detail { padding: clamp(16px, 2.5vw, 32px) 0 clamp(24px, 4vw, 56px); }
+.dish-detail-layout {
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px;
+  width: 100%; max-width: var(--max); margin-inline: auto;
+}
+@media (min-width: 900px) {
+  .dish-detail-layout {
+    grid-template-columns: minmax(0, 10fr) minmax(0, 11fr); gap: clamp(32px, 4vw, 64px); align-items: start;
+    padding-inline: var(--gutter);
+  }
+}
+.dish-detail-visual {
+  position: relative; isolation: isolate; overflow: hidden;
+  width: 100%; aspect-ratio: 4 / 3; background: var(--ink);
+}
+@media (max-width: 899px) { .dish-detail-visual { border-radius: 0 0 var(--radius-lg) var(--radius-lg); margin-top: calc(clamp(16px, 2.5vw, 32px) * -1); } }
+@media (min-width: 900px) {
+  /* Alto máximo ligado a la pantalla: con el header fijo, el cuadro siempre cabe y deja aire abajo. */
+  .dish-detail-visual { aspect-ratio: auto; height: min(560px, calc(100dvh - var(--header-h) - 64px)); border-radius: var(--radius-lg); }
+}
+.dish-detail-visual img { width: 100%; height: 100%; object-fit: cover; }
+.dish-detail-plate {
+  position: absolute; inset: 0; display: grid; place-items: center; color: var(--accent);
+  background:
+    radial-gradient(circle at 50% 52%, rgb(241 90 36 / 0.28) 0%, transparent 46%),
+    linear-gradient(140deg, #10110f 0%, #181915 55%, #221d18 100%);
+}
+.dish-detail-plate svg { position: relative; width: clamp(96px, 22%, 150px); height: auto; filter: drop-shadow(0 12px 24px rgb(0 0 0 / 0.5)); }
+.dish-detail-plate__ring {
+  position: absolute; height: 62%; aspect-ratio: 1; border-radius: 50%;
+  border: 1px solid rgb(255 198 41 / 0.35); outline: 1px solid rgb(241 90 36 / 0.3); outline-offset: 22px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .dish-detail-plate svg { animation: burger-float 6s ease-in-out infinite; }
+}
+.dish-share-button { position: absolute; top: 16px; right: 16px; z-index: 1; }
+
+.dish-detail-content { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; align-content: start; padding-inline: var(--gutter); }
+@media (min-width: 900px) { .dish-detail-content { padding-inline: 0; } }
+
+.dish-detail-heading { display: grid; gap: 12px; justify-items: start; }
+.dish-detail-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; }
+.dish-detail-title { display: flex; align-items: center; gap: 16px; }
+.dish-detail-crumbs { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 600; color: var(--text-muted); }
+.dish-detail-crumbs a { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; }
+.dish-detail-crumbs a:hover { color: var(--accent-text); }
+.dish-detail-heading h1 { font-size: clamp(44px, 6vw, 72px); line-height: 0.9; }
+.dish-detail-size { font-size: 13px; }
+.dish-detail-price { font-family: var(--font-display); font-size: clamp(40px, 4vw, 52px); font-weight: 800; line-height: 1; color: var(--accent-text); }
+.dish-detail-description { max-width: 52ch; font-size: 17px; line-height: 1.6; color: var(--text-muted); }
+.dish-detail-note { padding: 12px 14px; border-radius: var(--radius); background: var(--surface-2); font-size: 14px; color: var(--text-muted); }
+
+.dish-detail-section { display: grid; gap: 12px; }
+.dish-detail-section h2 { font-size: 18px; font-weight: 700; }
+.dish-options-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.dish-options-heading span { padding: 3px 10px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); font-size: 13px; font-weight: 700; color: var(--accent-text); font-variant-numeric: tabular-nums; }
+
+.dish-ingredient-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.dish-ingredient-chips li { padding: 8px 14px; border-radius: var(--radius-pill); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); font-size: 14px; }
+.dish-ingredient-chips li::first-letter, .dish-extra__name::first-letter { text-transform: uppercase; }
+
+/* Extras compactos: fila con «+» → «✓», nombre y precio. Toda la fila es el objetivo táctil. */
+.dish-extra-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 380px) { .dish-extra-grid { grid-template-columns: minmax(0, 1fr); } }
+.dish-extra {
+  position: relative; display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 10px;
+  min-height: 52px; padding: 8px 12px 8px 10px;
+  border-radius: var(--radius); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line);
+  cursor: pointer; transition: box-shadow 0.2s, background-color 0.2s;
+}
+.dish-extra:hover { box-shadow: inset 0 0 0 1px var(--text-muted); }
+.dish-extra:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dish-extra.is-selected { background: color-mix(in srgb, var(--accent) 9%, var(--surface)); box-shadow: inset 0 0 0 2px var(--accent); }
+.dish-extra:has(input:disabled) { opacity: 0.45; cursor: not-allowed; }
+.dish-extra input { position: absolute; opacity: 0; pointer-events: none; }
+.dish-extra__mark {
+  display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--surface-2); color: var(--accent-text); transition: background-color 0.2s, color 0.2s;
+}
+.dish-extra.is-selected .dish-extra__mark { background: var(--accent); color: #fff; }
+.dish-extra__name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 15px; font-weight: 600; }
+.dish-extra__price { font-size: 13px; color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Barra de compra: fija abajo en móvil; en escritorio flota al pie de la columna mientras eliges extras. */
+.dish-purchase-bar {
+  position: sticky; bottom: 0; z-index: 10;
+  display: flex; align-items: center; gap: 12px;
+  margin-inline: calc(var(--gutter) * -1); padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line);
+}
+@media (min-width: 900px) {
+  .dish-purchase-bar {
+    bottom: 16px; margin: 8px 0 0; padding: 10px;
+    border: 1px solid var(--line); border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--surface) 92%, transparent); box-shadow: var(--shadow);
+  }
+}
+.dish-purchase-button { flex: 1; min-height: 52px; }
+.dish-purchase-button strong { display: inline-flex; align-items: center; font-size: 17px; }
+
+/* ── Checkout (ref-3) ──────────────────────────────────────── */
+.checkout { display: grid; gap: 28px; margin-top: 8px; }
+@media (min-width: 960px) {
+  .checkout { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 48px; align-items: start; }
+  .checkout__summary { position: sticky; top: calc(var(--header-h) + 24px); }
+}
+.checkout__form h1 { font-size: clamp(44px, 6vw, 72px); }
+
+.summary {
+  display: grid; gap: 12px; padding: clamp(18px, 2.5vw, 28px);
+  border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface);
+}
+.summary h2 { font-size: 22px; font-weight: 700; }
+.summary__lines { display: grid; margin: 0; padding: 0; list-style: none; }
+.summary__lines li { display: flex; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.summary__lines li > span { display: grid; gap: 4px; justify-items: start; min-width: 0; }
+.summary__lines b { font-size: 15px; }
+.summary__lines small { font-size: 13px; color: var(--text-muted); }
+.summary__lines .pill { margin-left: 6px; }
+.summary__lines .stepper { margin-top: 6px; }
+.summary__total { display: flex; justify-content: space-between; align-items: baseline; padding-top: 4px; font-size: 20px; font-weight: 700; }
+
+/* ── Pedido confirmado (ref-1) ─────────────────────────────── */
+.confirm { display: grid; justify-items: center; gap: 16px; max-width: 560px; text-align: center; padding-top: clamp(32px, 6vw, 72px); }
+.confirm__icon { color: var(--accent); }
+.confirm h1 { font-size: clamp(44px, 7vw, 72px); }
+.confirm__summary { width: 100%; text-align: left; }

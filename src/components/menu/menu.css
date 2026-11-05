@@ -74,22 +74,40 @@
 /* ── Categorías en círculos (ref-1, ref-7) ────────────────── */
 .menu-intro .section-head { margin-bottom: 12px; }
 .category-nav {
-  display: flex; gap: clamp(12px, 2vw, 24px);
+  display: flex; gap: clamp(12px, 1.5vw, 20px);
   /* Sin scroll-snap: las categorías llegan después y el snap dejaba la fila pegada al final. */
   overflow-x: auto; scrollbar-width: none;
   padding: 6px 2px 8px; margin-inline: -2px;
 }
 .category-nav::-webkit-scrollbar { display: none; }
-.category-nav__item { flex: none; display: grid; justify-items: center; align-content: start; gap: 8px; width: 84px; }
+.category-nav__item { flex: none; display: grid; justify-items: center; align-content: start; gap: 8px; width: 108px; }
 .category-nav__icon {
   display: grid; place-items: center; width: 72px; height: 72px; overflow: hidden;
-  border-radius: 50%; background: var(--surface); color: var(--accent-text);
+  border: 1px solid color-mix(in srgb, #640000 24%, var(--line));
+  border-radius: 50%; background: var(--surface); color: #640000;
   box-shadow: 0 0 0 1px var(--line);
   transition: box-shadow 0.2s, transform 0.3s var(--ease-out), background-color 0.2s, color 0.2s;
 }
-.category-nav__icon--promo { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
-.category-nav__item:hover .category-nav__icon { transform: translateY(-2px); background: var(--accent); color: #fff; box-shadow: 0 0 0 1px var(--accent); }
-.category-nav__label { max-width: 100%; font-size: 14px; font-weight: 600; text-align: center; line-height: 1.25; }
+.category-nav__icon--promo { background: color-mix(in srgb, #f15a24 14%, var(--surface)); color: #640000; }
+.category-nav__item:hover .category-nav__icon { transform: translateY(-2px); background: #f15a24; color: #fff; border-color: #640000; box-shadow: 0 0 0 2px #640000; }
+.category-nav__label { max-width: 100%; font-size: 14px; font-weight: 600; text-align: center; line-height: 1.25; text-wrap: balance; }
+html:not([data-theme='dark']) .category-nav__icon,
+html:not([data-theme='dark']) .category-nav__icon--promo {
+  border-color: #640000;
+  background: #640000;
+  color: #fff;
+  box-shadow: 0 0 0 1px #640000;
+}
+html:not([data-theme='dark']) .category-nav__item:hover .category-nav__icon {
+  transform: translateY(-2px);
+  border-color: #640000;
+  background: #640000;
+  color: #fff;
+  box-shadow: 0 0 0 1px #640000;
+}
+html[data-theme='dark'] .category-nav__icon { border-color: var(--line); color: var(--accent); }
+html[data-theme='dark'] .category-nav__icon--promo { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+html[data-theme='dark'] .category-nav__item:hover .category-nav__icon { background: var(--accent); color: var(--on-accent); border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
 
 /* ── Carrusel ──────────────────────────────────────────────── */
 .carousel { position: relative; }
@@ -135,7 +153,6 @@ html[data-theme='dark'] .promo-card { box-shadow: inset 0 0 0 1px var(--line); }
   background: color-mix(in srgb, var(--accent) 12%, var(--surface)); color: var(--accent-text);
   font-size: 13px; font-weight: 700;
 }
-.promo-card--weekly .promo-card__tag { background: var(--yellow); color: #171717; }
 .promo-card__icon {
   display: grid; place-items: center; width: 40px; height: 40px; flex: none;
   border-radius: 50%; background: var(--surface-2); color: var(--accent-text);
@@ -169,6 +186,8 @@ html[data-theme='dark'] .promo-card { box-shadow: inset 0 0 0 1px var(--line); }
 .promo-card__foot::before { left: calc(var(--notch) * -1); }
 .promo-card__foot::after { right: calc(var(--notch) * -1); }
 .promo-card__price { font-family: var(--font-display); font-size: 36px; font-weight: 800; line-height: 1; color: var(--accent-text); }
+html:not([data-theme='dark']) .promo-card__price { color: #640000; }
+html[data-theme='dark'] .promo-card__price { color: var(--accent); }
 .promo-card__add { width: 48px; height: 48px; }
 
 /* ── Ubicación: foto del local de fondo y tarjeta «Ubícanos» con el mapa encima ── */

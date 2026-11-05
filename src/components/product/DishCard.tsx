@@ -25,7 +25,7 @@ export function DishCard({ dish }: { dish: Dish }) {
     <article className="dish-card">
       <Link className="dish-card__media" to={href} tabIndex={-1} aria-hidden="true">
         {dish.image
-          ? <img src={imageUrl(dish.image, 600)} alt="" loading="lazy" />
+          ? <img src={imageUrl(dish.image, 600)} alt="" loading="lazy" draggable={false} />
           : <span className="dish-card__placeholder"><FoodIcon category={dish.category} size={40} strokeWidth={1.5} /></span>}
       </Link>
       <div className="dish-card__body">

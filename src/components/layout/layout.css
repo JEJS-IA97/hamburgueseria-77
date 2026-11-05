@@ -1,4 +1,26 @@
 /* Header, menú móvil y pie. */
+@font-face {
+  font-family: 'Fashion Fetish';
+  src: url('/fonts/fashion-fetish-regular.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fashion Fetish';
+  src: url('/fonts/fashion-fetish-bold.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fashion Fetish';
+  src: url('/fonts/fashion-fetish-heavy.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+}
+
 .site-shell { min-height: 100dvh; display: flex; flex-direction: column; }
 .site-shell > main { flex: 1; }
 
@@ -11,9 +33,9 @@
 .site-header__bar { display: flex; align-items: center; gap: 20px; min-height: var(--header-h); }
 
 .brand { display: inline-flex; align-items: center; gap: 10px; flex: none; }
-.brand img { width: 48px; height: 48px; object-fit: cover; border-radius: 12px; background: #000; }
-.brand span { font-family: var(--font-display); font-size: 22px; font-weight: 800; line-height: 1; text-transform: uppercase; }
-.brand b { color: var(--accent); }
+.brand img { width: 48px; height: 48px; object-fit: cover; border: 1px solid #dfd833; border-radius: 50%; background: #640000; }
+.brand span { font-family: 'Fashion Fetish', var(--font-ui); font-size: 22px; font-weight: 400; line-height: 1; text-transform: uppercase; }
+.brand b { margin-left: 3px; color: #f15a24; font-family: 'Fashion Fetish', var(--font-ui); font-size: 1.25em; font-weight: 900; }
 
 .site-nav { display: flex; gap: 4px; }
 .site-nav a {
@@ -28,8 +50,8 @@
 
 .site-header__actions { display: flex; align-items: center; gap: 6px; }
 /* Naranja de marca en ambos modos (antes usaba --strong, que se invierte con el tema). */
-.cart-button { position: relative; background: var(--accent); color: #fff; }
-.cart-button:hover { background: color-mix(in srgb, var(--accent) 86%, #000); }
+.cart-button { position: relative; background: #f15a24; color: #fff; }
+.cart-button:hover { background: color-mix(in srgb, #f15a24 86%, #640000); }
 .cart-button__count {
   position: absolute; top: -3px; right: -3px;
   display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px;
@@ -47,8 +69,8 @@
   .site-header__bar { display: grid; grid-template-columns: 44px 1fr 44px; gap: 8px; }
   .menu-button { display: grid; }
   .brand { justify-self: center; }
-  .brand img { width: 40px; height: 40px; border-radius: 10px; }
-  .brand span { font-size: 19px; }
+  .brand img { width: 40px; height: 40px; }
+  .brand span { display: none; }
   .theme-button { display: none; }
 }
 @media (min-width: 768px) and (max-width: 899px) {
@@ -59,13 +81,18 @@
   margin: 0 auto 0 0; padding: 0; border: 0;
   width: min(340px, 86vw); height: 100dvh; max-height: none; max-width: none;
   background: var(--bg); color: var(--text);
+  border-right: 3px solid #640000;
 }
 .mobile-menu::backdrop { background: rgb(8 10 14 / 0.5); }
 .mobile-menu[open] { animation: menu-in 0.32s var(--ease-out); }
 @keyframes menu-in { from { transform: translateX(-100%); } }
 .mobile-menu__panel { display: flex; flex-direction: column; height: 100%; }
 .mobile-menu__head { display: flex; align-items: center; justify-content: space-between; padding: 10px 10px 10px 20px; border-bottom: 1px solid var(--line); }
-.mobile-menu__head img { width: 44px; height: 44px; object-fit: cover; border-radius: 10px; background: #000; }
+.mobile-menu__brand { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+.mobile-menu__brand img { width: 36px; height: 36px; flex: none; object-fit: contain; border: 1px solid #dfd833; border-radius: 50%; background: #640000; }
+.mobile-menu__brand span { font-family: 'Fashion Fetish', var(--font-ui); font-size: 16px; line-height: 1; text-transform: uppercase; }
+.mobile-menu__brand b { color: #f15a24; font-size: 1.15em; font-weight: 900; }
+.mobile-menu__head { border-bottom-color: color-mix(in srgb, #640000 24%, var(--line)); }
 .mobile-menu__search { padding: 16px 20px 4px; }
 .mobile-menu__search .header-search { max-width: none; margin: 0; }
 .mobile-menu__nav { display: grid; padding: 8px 12px; }
@@ -73,14 +100,17 @@
   display: flex; align-items: center; justify-content: space-between; min-height: 56px; padding: 0 8px;
   border-radius: var(--radius); font-family: var(--font-display); font-size: 26px; font-weight: 800; text-transform: uppercase;
 }
-.mobile-menu__nav a:hover { background: var(--surface-2); }
+.mobile-menu__nav a:hover { background: color-mix(in srgb, #640000 8%, var(--surface)); color: #640000; }
+.mobile-menu__nav a:focus-visible { outline-color: #f15a24; }
 .mobile-menu__nav a svg { color: var(--text-muted); }
+.mobile-menu__nav a:hover svg { color: #f15a24; }
 .mobile-menu__foot { margin-top: auto; padding: 12px 12px calc(16px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); }
 .mobile-menu__row {
   display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 8px;
   border: 0; border-radius: var(--radius); background: none; font-size: 15px; font-weight: 600; text-align: left;
 }
 .mobile-menu__row:hover { background: var(--surface-2); }
+.mobile-menu__row:hover svg { color: #f15a24; }
 
 /* Pie oscuro en ambos modos, estructura de LM Perfumes: llamada a pedir, marca + 3 columnas
    (acordeón en móvil, columnas fijas en escritorio) y línea legal. */
@@ -100,14 +130,14 @@ html[data-theme='dark'] .site-footer { background: #0a0a09; border-top: 1px soli
 @media (min-width: 768px) { .site-footer__grid { grid-template-columns: 2fr 1fr 1fr 1.4fr; gap: 40px; } }
 
 /* Separación por gap: no depende de los márgenes de los párrafos. */
-.site-footer__about { display: flex; align-items: center; gap: 16px; padding-bottom: 24px; }
-@media (min-width: 768px) { .site-footer__about { flex-direction: column; align-items: flex-start; gap: 18px; padding: 0; } }
-.site-footer__about img { flex: none; width: 64px; height: 64px; object-fit: cover; border-radius: 14px; background: #000; }
+.site-footer__about { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; padding-bottom: 24px; }
+@media (min-width: 768px) { .site-footer__about { gap: 18px; padding: 0; } }
+.site-footer__about img { flex: none; width: 64px; height: 64px; object-fit: cover; border: 1px solid #dfd833; border-radius: 50%; background: #640000; }
 @media (min-width: 768px) { .site-footer__about img { width: 72px; height: 72px; } }
 .site-footer__about p { max-width: 34ch; font-size: 15px; }
 .site-footer__about p + p { margin-top: 4px; }
-.site-footer__brand { font-family: var(--font-display); font-size: 30px !important; font-weight: 800; line-height: 1; color: #fff; text-transform: uppercase; }
-.site-footer__brand b { color: var(--accent); }
+.site-footer__brand { font-family: 'Fashion Fetish', var(--font-ui); font-size: 24px !important; font-weight: 400; line-height: 1; color: #fff; text-transform: uppercase; }
+.site-footer__brand b { margin-left: 3px; color: #f15a24; font-family: 'Fashion Fetish', var(--font-ui); font-size: 1.25em; font-weight: 900; }
 
 .site-footer__col { border-top: 1px solid #2c2c28; }
 .site-footer__col summary { display: flex; align-items: center; justify-content: space-between; min-height: 52px; cursor: pointer; list-style: none; }
@@ -136,3 +166,13 @@ html[data-theme='dark'] .site-footer { background: #0a0a09; border-top: 1px soli
 .site-footer__social { display: flex; gap: 8px; margin-top: 14px; }
 .site-footer__social .icon-btn { border: 1px solid #3a3a35; color: #fff; }
 .site-footer__social .icon-btn:hover { border-color: var(--accent); background: var(--accent); }
+
+/* Vinotinto del logo y navegación solo en tema claro. */
+html:not([data-theme='dark']) .brand img,
+html:not([data-theme='dark']) .site-footer__about img { background: #640000; }
+html:not([data-theme='dark']) .mobile-menu { border-right: 3px solid #640000; }
+html:not([data-theme='dark']) .mobile-menu__head { border-bottom-color: color-mix(in srgb, #640000 24%, var(--line)); }
+html:not([data-theme='dark']) .mobile-menu__nav a:hover { background: color-mix(in srgb, #640000 8%, var(--surface)); color: #640000; }
+html[data-theme='dark'] .mobile-menu { border-right: 0; }
+html[data-theme='dark'] .mobile-menu__head { border-bottom-color: var(--line); }
+html[data-theme='dark'] .mobile-menu__nav a:hover { background: var(--surface-2); color: var(--text); }

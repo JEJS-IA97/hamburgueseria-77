@@ -68,7 +68,7 @@ export function StoreLayout() {
 
           <div className="site-footer__grid">
             <div className="site-footer__about">
-              <img src="/images/logo.jpeg" alt="" width={72} height={72} />
+              <img src="/images/logo-variant.svg" alt="" width={72} height={72} />
               <div>
                 <p className="site-footer__brand">Hamburguesería <b>77</b></p>
                 <p>Hamburguesas, completos, pizzas y combos hechos al momento en Labranza.</p>
@@ -95,7 +95,7 @@ export function StoreLayout() {
               <a href={maps} target="_blank" rel="noreferrer"><MapPin size={16} /> {address}</a>
               {whatsapp && <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noreferrer"><MessageCircle size={16} /> +{whatsapp}</a>}
               <a href={settings?.instagram_url || instagramUrl} target="_blank" rel="noreferrer"><Instagram size={16} /> @lahamburgueseria77</a>
-              <a href={facebookUrl} target="_blank" rel="noreferrer"><Facebook size={16} /> Hamburguesería Labranza</a>
+              <a href={facebookUrl} target="_blank" rel="noreferrer"><Facebook size={16} />La Hamburguesería 77</a>
               {settings?.tiktok_url && <a href={settings.tiktok_url} target="_blank" rel="noreferrer">TikTok</a>}
             </FooterCol>
           </div>

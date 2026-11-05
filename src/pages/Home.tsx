@@ -7,6 +7,7 @@ import { PromotionSection, type Promotion } from '../components/menu/PromotionSe
 import { supabase } from '../lib/supabase';
 
 const categoryOrder = ['Hamburguesas', 'Completos', 'Pizzas', 'Sándwiches', 'As', 'Bowls', 'Menú saludable', 'Bebidas', 'Mechadas', 'Pepitos', 'Chorrillanas', 'Frituras', 'Pollo Crispy', 'Cafetería'];
+const categoryNavOrder = ['Hamburguesas', 'Pizzas', 'Completos', 'Bowls', 'Sándwiches', 'Bebidas', 'Menú saludable', 'As', 'Mechadas', 'Chorrillanas', 'Pepitos', 'Frituras', 'Pollo Crispy', 'Cafetería'];
 const homeCategoryOrder = ['Hamburguesas', 'Completos', 'Pizzas', 'Sándwiches', 'As', 'Bowls', 'Menú saludable', 'Bebidas'];
 const excludedCategories = new Set(['combos', 'promociones']);
 const storeAddress = 'C. 1 Nte. 0115, 4780000 Labranza, Temuco, Araucanía, Chile';
@@ -37,7 +38,13 @@ export function Home() {
       return (aIndex < 0 ? 999 : aIndex) - (bIndex < 0 ? 999 : bIndex) || a.localeCompare(b, 'es');
     });
   }, [catalogDishes]);
-  const categoryLinks = activeCategories.map(name => ({ name, anchor: anchorFor(name) }));
+  const categoryLinks = activeCategories
+    .map(name => ({ name, anchor: anchorFor(name) }))
+    .sort((a, b) => {
+      const aIndex = categoryNavOrder.findIndex(name => normalize(name) === normalize(a.name));
+      const bIndex = categoryNavOrder.findIndex(name => normalize(name) === normalize(b.name));
+      return (aIndex < 0 ? 999 : aIndex) - (bIndex < 0 ? 999 : bIndex) || a.name.localeCompare(b.name, 'es');
+    });
   const homeCategoryLinks = categoryLinks.filter(category => homeCategoryOrder.some(name => normalize(name) === normalize(category.name)));
 
   return <main>

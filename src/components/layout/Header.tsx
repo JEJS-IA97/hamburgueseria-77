@@ -47,7 +47,7 @@ export function Header() {
         </button>
 
         <Link className="brand" to="/" aria-label="Hamburguesería 77, inicio">
-          <img src="/images/logo.jpeg" alt="" width={48} height={48} />
+          <img src="/images/logo-variant.svg" alt="" width={48} height={48} />
           <span>Hamburguesería <b>77</b></span>
         </Link>
 
@@ -71,7 +71,10 @@ export function Header() {
       <dialog className="mobile-menu" ref={menu} onClick={event => { if (event.target === menu.current) menu.current?.close(); }}>
         <div className="mobile-menu__panel">
           <div className="mobile-menu__head">
-            <img src="/images/logo.jpeg" alt="Hamburguesería 77" width={44} height={44} />
+            <Link className="mobile-menu__brand" to="/" onClick={() => menu.current?.close()}>
+              <img src="/images/logo-variant.svg" alt="" width={36} height={36} />
+              <span>Hamburguesería <b>77</b></span>
+            </Link>
             <button className="icon-btn" aria-label="Cerrar menú" onClick={() => menu.current?.close()}><X size={22} /></button>
           </div>
           <div className="mobile-menu__search">{searchForm}</div>

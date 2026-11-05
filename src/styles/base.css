@@ -73,10 +73,11 @@ body {
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.25s, color 0.25s;
 }
-img { display: block; max-width: 100%; }
+img { display: block; max-width: 100%; -webkit-user-drag: none; user-select: none; }
 a { color: inherit; text-decoration: none; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
+button, a { -webkit-tap-highlight-color: transparent; }
 h1, h2, h3 { text-wrap: balance; margin: 0; }
 p { margin: 0; }
 ::selection { background: var(--accent); color: var(--on-accent); }
@@ -101,7 +102,7 @@ p { margin: 0; }
 }
 
 /* Cabecera de sección: título a la izquierda, «Ver todo» a la derecha (ref-7). */
-.section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.section-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
 .section-head h2 { font-size: clamp(30px, 4vw, 48px); }
 .section-head__link {
   display: inline-flex; align-items: center; gap: 4px; flex: none;

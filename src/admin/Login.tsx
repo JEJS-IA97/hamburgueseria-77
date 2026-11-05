@@ -33,16 +33,16 @@ export function Login({ configMissing = false, unauthorized = false }: { configM
       <aside className="login-page__brand" aria-hidden="true">
         <img className="login-page__bg" src="/images/hero-festin-callejero.png" alt="" />
         <div className="login-page__brand-copy">
-          <img src="/images/logo.jpeg" alt="" width={88} height={88} />
-          <p className="display">Panel del <em>local</em></p>
-          <p>Platos, combos, pedidos y datos de Hamburguesería 77.</p>
+          <img src="/images/logo-login.svg" alt="" width={88} height={88} />
+          <p className="display">Panel de <em>control</em></p>
+          <p>Platos, combos, pedidos y datos de la hamburguesería.</p>
         </div>
       </aside>
 
       <section className="login-page__form">
         <Link to="/" className="back-link"><ArrowLeft size={18} /> Volver a la carta</Link>
         <form className="login" onSubmit={submit} noValidate={false}>
-          <img className="login__logo" src="/images/logo.jpeg" alt="" width={56} height={56} />
+          <img className="login__logo" src="/images/logo-login.svg" alt="" width={56} height={56} />
           <div className="login__head">
             <h1 className="display">Iniciar <em>sesión</em></h1>
             <p className="muted">{unauthorized ? 'Esta cuenta no tiene acceso de administrador. Entra con una cuenta autorizada.' : 'Solo para el equipo de Hamburguesería 77.'}</p>

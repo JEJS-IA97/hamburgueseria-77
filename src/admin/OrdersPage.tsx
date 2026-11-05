@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { formatCLP } from '../lib';
 import { Select } from '../components/ui/Select';
+import { ErrorState, LoadingState } from '../components/ui/LoadState';
 
 type OrderItem = {
   name: string;
@@ -20,13 +21,21 @@ export function OrdersPage() {
   const [rows, setRows] = useState<any[]>([]);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    supabase?.from('orders').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+    let active = true;
+    setLoading(true);
+    if (!supabase) { setError('Supabase no está configurado.'); setLoading(false); return; }
+    Promise.resolve(supabase.from('orders').select('*').order('created_at', { ascending: false })).then(({ data, error }) => {
+      if (!active) return;
       if (error) setError(error.message);
-      else setRows(data ?? []);
-    });
-  }, []);
+      else { setRows(data ?? []); setError(''); }
+      setLoading(false);
+    }).catch(() => { if (active) { setError('No se pudieron cargar los pedidos desde el servidor.'); setLoading(false); } });
+    return () => { active = false; };
+  }, [attempt]);
 
   async function status(id: string, value: string) {
     if (!supabase) return;
@@ -49,9 +58,9 @@ export function OrdersPage() {
           {statuses.map(value => <option key={value} value={value}>{value}</option>)}
         </Select>
       </div>
-      {error && <p className="alert">{error}</p>}
-      {visible.length === 0 && <p className="empty-state">No hay pedidos.</p>}
-      <div className="orders">
+      {error && <ErrorState message={error} onRetry={() => setAttempt(value => value + 1)} />}
+      {loading ? <LoadingState label="Cargando pedidos…" /> : visible.length === 0 && !error ? <p className="empty-state">No hay pedidos.</p> : null}
+      {!loading && !error && <div className="orders">
         {visible.map(order => {
           const items = Array.isArray(order.items) ? order.items as OrderItem[] : [];
           return (
@@ -91,7 +100,7 @@ export function OrdersPage() {
             </details>
           );
         })}
-      </div>
+      </div>}
     </section>
   );
 }

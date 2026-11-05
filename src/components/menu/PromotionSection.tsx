@@ -5,6 +5,7 @@ import { useCart } from '../../store/cart';
 import type { Dish } from '../../data';
 import { Carousel } from './Carousel';
 import { FoodIcon } from '../ui/FoodIcon';
+import { ErrorState, LoadingState } from '../ui/LoadState';
 
 export type Promotion = {
   id: string;
@@ -97,13 +98,15 @@ function PromoCard({ promo }: { promo: Promotion }) {
   );
 }
 
-export function PromotionSection({ promotions }: { promotions: Promotion[] }) {
+export function PromotionSection({ promotions, status = 'ready', onRetry }: { promotions: Promotion[]; status?: 'loading' | 'ready' | 'error'; onRetry?: () => void }) {
   return (
     <section className="section" id="promos" aria-labelledby="promotions-title">
       <div className="section-head">
         <h2 className="display" id="promotions-title">Combos y <em>promos</em></h2>
       </div>
-      {promotions.length
+      {status === 'loading' ? <LoadingState label="Cargando combos y promociones…" />
+        : status === 'error' ? <ErrorState message="No pudimos cargar las promociones desde el servidor." onRetry={onRetry} />
+        : promotions.length
         ? <Carousel className="carousel--promos" label="Combos y promociones">
             {promotions.map(promo => <div className="carousel__item" key={promo.id}><PromoCard promo={promo} /></div>)}
           </Carousel>

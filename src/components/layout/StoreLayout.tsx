@@ -31,6 +31,7 @@ function FooterCol({ title, children }: { title: string; children: ReactNode }) 
 
 export function StoreLayout() {
   const [settings, setSettings] = useState<StoreSettings>();
+  const [settingsError, setSettingsError] = useState(false);
   const { pathname, hash } = useLocation();
 
   // Al cambiar de página se empieza arriba (antes se heredaba el scroll de la página anterior).
@@ -39,8 +40,11 @@ export function StoreLayout() {
   }, [pathname, hash]);
 
   useEffect(() => {
-    supabase?.from('settings').select('address,whatsapp_number,instagram_url,tiktok_url').eq('id', true).maybeSingle()
-      .then(({ data }) => { if (data) setSettings(data); });
+    if (supabase) Promise.resolve(supabase.from('settings').select('address,whatsapp_number,instagram_url,tiktok_url').eq('id', true).maybeSingle())
+      .then(({ data, error }) => {
+        if (error || !data) setSettingsError(true);
+        else setSettings(data);
+      }).catch(() => setSettingsError(true));
     // En móvil las columnas empiezan cerradas.
     if (window.matchMedia('(max-width: 767px)').matches) {
       document.querySelectorAll<HTMLDetailsElement>('.site-footer__col').forEach(col => { col.open = false; });
@@ -56,6 +60,7 @@ export function StoreLayout() {
       <Header />
       <CartDrawer />
       <Outlet />
+      {settingsError && <div className="container"><p className="notice" role="alert">No se pudieron cargar los datos de contacto del local. Mostramos la dirección predeterminada.</p></div>}
       <footer className="site-footer">
         <div className="container">
           <div className="site-footer__cta">

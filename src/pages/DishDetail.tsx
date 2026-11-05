@@ -3,21 +3,34 @@ import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, Check, ChevronRight, Minus, Plus, Share2 } from 'lucide-react';
 import { FoodIcon } from '../components/ui/FoodIcon';
 import { getDishes } from '../api/catalog';
-import { imageUrl, type Dish } from '../data';
+import { extraPrice, imageUrl, type Dish } from '../data';
 import { formatCLP, formatDishPrice } from '../lib';
 import { useCart } from '../store/cart';
+import { ErrorState, LoadingState } from '../components/ui/LoadState';
+import { NotFound } from './NotFound';
 
 export function DishDetail() {
   const { id } = useParams();
   const [dish, setDish] = useState<Dish>();
+  const [loadStatus, setLoadStatus] = useState<'loading' | 'ready' | 'error' | 'missing'>('loading');
+  const [attempt, setAttempt] = useState(0);
   const [extras, setExtras] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const add = useCart((state) => state.add);
 
   useEffect(() => {
-    getDishes().then((dishes) => setDish(dishes.find((item) => item.id === id)));
-  }, [id]);
+    let active = true;
+    setDish(undefined);
+    setLoadStatus('loading');
+    getDishes().then((dishes) => {
+      if (!active) return;
+      const found = dishes.find((item) => item.id === id);
+      setDish(found);
+      setLoadStatus(found ? 'ready' : 'missing');
+    }).catch(() => { if (active) setLoadStatus('error'); });
+    return () => { active = false; };
+  }, [id, attempt]);
 
   const includedLimit = dish?.extra_selection_limit ?? (dish?.code === 'ARMABLE' ? 3 : 0);
   const isIncluded = (name: string) =>
@@ -28,20 +41,15 @@ export function DishDetail() {
   );
   const selectedExtrasPrice = dish?.extras
     .filter((extra) => extras.includes(extra.name) && !isIncluded(extra.name))
-    .reduce((total, extra) => total + extra.price_clp, 0) ?? 0;
+    .reduce((total, extra) => total + extraPrice(dish!, extra), 0) ?? 0;
   const unitPrice = dish?.price_clp == null ? null : dish.price_clp + selectedExtrasPrice;
   const canAdd = Boolean(
     dish && unitPrice != null && (!includedLimit || selectedIncluded === includedLimit),
   );
 
-  if (!dish) {
-    return (
-      <main className="container page">
-        <Link to="/#menu" className="back-link"><ArrowLeft size={18} /> Volver al menú</Link>
-        <h1 className="display">Plato no encontrado</h1>
-      </main>
-    );
-  }
+  if (loadStatus === 'loading') return <main className="container page"><LoadingState label="Cargando el producto…" /></main>;
+  if (loadStatus === 'error') return <main className="container page"><ErrorState message="No pudimos cargar este producto desde el servidor." onRetry={() => setAttempt(value => value + 1)} /></main>;
+  if (loadStatus === 'missing' || !dish) return <NotFound message="Este producto no está en el menú o ya no está disponible." />;
 
   const shareDish = async () => {
     if (navigator.share) {
@@ -147,7 +155,7 @@ export function DishDetail() {
                       />
                       <span className="dish-extra__mark" aria-hidden="true">{checked ? <Check size={16} strokeWidth={3} /> : <Plus size={16} strokeWidth={2.5} />}</span>
                       <span className="dish-extra__name">{extra.name}</span>
-                      <span className="dish-extra__price">{included ? 'Incluido' : `+${formatCLP(extra.price_clp)}`}</span>
+                      <span className="dish-extra__price">{included ? 'Incluido' : `+${formatCLP(extraPrice(dish, extra))}`}</span>
                     </label>
                   );
                 })}

@@ -4,6 +4,7 @@ import { imageUrl, type Dish } from '../data';
 import { deleteDish, getCategories, getDishes, saveDish } from '../api/catalog';
 import { formatDishPrice } from '../lib';
 import { Select } from '../components/ui/Select';
+import { ErrorState, LoadingState } from '../components/ui/LoadState';
 
 const emptyDish = (): Dish => ({
   id: crypto.randomUUID(), name: '', category: 'Hamburguesas', description: '', ingredients: [], price_clp: null, image: '',
@@ -16,16 +17,21 @@ export function ProductsPage() {
   const [edit, setEdit] = useState<Dish | null>(null);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [attempt, setAttempt] = useState(0);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('');
   const dialog = useRef<HTMLDialogElement>(null);
 
   async function reload() {
-    const [dishes, categories] = await Promise.all([getDishes(), getCategories()]);
-    setItems(dishes);
-    setCategoryRows(categories);
+    setLoading(true);
+    try {
+      const [dishes, categories] = await Promise.all([getDishes(), getCategories()]);
+      setItems(dishes);
+      setCategoryRows(categories);
+    } finally { setLoading(false); }
   }
-  useEffect(() => { reload().catch(e => setError(e.message)); }, []);
+  useEffect(() => { reload().catch(e => setError(e.message)); }, [attempt]);
   useEffect(() => { if (edit) dialog.current?.showModal(); else dialog.current?.close(); }, [edit]);
 
   const visible = useMemo(() => {
@@ -84,7 +90,7 @@ export function ProductsPage() {
         </div>
         <button className="btn btn-primary" onClick={() => setEdit(emptyDish())}><Plus size={18} /> Nuevo plato</button>
       </div>
-      {error && !edit && <p className="alert">{error}</p>}
+      {error && !edit && <ErrorState message={error} onRetry={() => setAttempt(value => value + 1)} />}
 
       <div className="admin-filters">
         <label className="search-input">
@@ -98,7 +104,7 @@ export function ProductsPage() {
       </div>
       <p className="admin-count muted">{visible.length} de {items.length} platos</p>
 
-      <ul className="admin-list admin-list--scroll">
+      {loading ? <LoadingState label="Cargando platos…" /> : error && !edit ? null : items.length === 0 ? <p className="empty-state">No hay productos guardados en Supabase.</p> : <ul className="admin-list admin-list--scroll">
         {visible.map(dish => <li className="admin-row admin-row--dish" key={dish.id}>
           <span className="admin-row__thumb">{dish.image && <img src={imageUrl(dish.image, 120)} alt="" loading="lazy" />}</span>
           <span className="admin-row__main">
@@ -112,7 +118,7 @@ export function ProductsPage() {
             <button className="icon-btn admin-danger" onClick={() => remove(dish)} aria-label={`Eliminar ${dish.name}`}><Trash2 size={18} /></button>
           </span>
         </li>)}
-      </ul>
+      </ul>}
 
       <dialog className="admin-dialog" ref={dialog} onClose={() => setEdit(null)}>
         {edit && <form className="form" onSubmit={save}>

@@ -13,7 +13,7 @@ Para crear `dist` para Cloudflare Pages: `npm run build`. En Pages, usa comando 
 
 ## Configurar Supabase
 
-1. Ejecuta en orden `supabase/migrations/0001_menu_orders.sql` y `supabase/migrations/0002_normalized_catalog.sql` en el SQL Editor del proyecto.
+1. Ejecuta en orden todas las migraciones `supabase/migrations/0001_menu_orders.sql` a `0004_extra_pricing_and_selection.sql` en el SQL Editor del proyecto.
 2. Ejecuta `supabase/seed.sql`; importa las 2 cartas con precios en CLP, variantes, combos, promociones, ingredientes compartidos normalizados y extras.
 3. En Authentication, desactiva el registro público. Crea las dos cuentas de administrador con invitación o desde el panel.
 4. Añade únicamente los UUID de esas dos cuentas a `public.admins` desde el editor SQL: `insert into public.admins(user_id) values ('UUID-ADMIN-1'), ('UUID-ADMIN-2');`.

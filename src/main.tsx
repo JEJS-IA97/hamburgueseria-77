@@ -13,6 +13,7 @@ import { OrdersPage } from './admin/OrdersPage';
 import { CategoriesPage } from './admin/CategoriesPage';
 import { SettingsPage } from './admin/SettingsPage';
 import { PromotionsPage } from './admin/PromotionsPage';
+import { NotFound } from './pages/NotFound';
 import { applyTheme, getInitialTheme } from './lib';
 import './styles/base.css';
 import './components/layout/layout.css';
@@ -34,7 +35,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/categoria/:slug" element={<CategoryPage />} />
           <Route path="/plato/:id" element={<DishDetail />} />
           <Route path="/checkout" element={<Checkout />} />
-          <Route path="*" element={<main className="container page"><h1 className="display">Página no encontrada</h1></main>} />
+          <Route path="*" element={<NotFound />} />
         </Route>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<ProductsPage />} />
@@ -42,6 +43,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="categories" element={<CategoriesPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="promotions" element={<PromotionsPage />} />
+          <Route path="*" element={<NotFound message="La sección del panel que buscas no existe." />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -139,3 +139,5 @@
 .confirm__icon { color: var(--accent); }
 .confirm h1 { font-size: clamp(44px, 7vw, 72px); }
 .confirm__summary { width: 100%; text-align: left; }
+.not-found { display: grid; justify-items: start; gap: 14px; }
+.not-found__code { color: var(--accent-text); font-family: var(--font-display); font-size: clamp(64px, 12vw, 120px); font-weight: 800; line-height: 0.85; }

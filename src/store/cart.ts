@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Dish } from '../data';
+import { extraPrice, type Dish } from '../data';
 
 export type CartLine = { dish: Dish; qty: number; extras: string[]; promotion_id?: string };
 
@@ -35,6 +35,9 @@ export const useCart = create<Cart>()(persist((set) => ({
 
 /** Precio de una línea con sus extras (mismo cálculo que el checkout). */
 export const lineTotal = (line: CartLine) =>
-  ((line.dish.price_clp ?? 0) + line.extras.reduce((sum, name) => sum + (line.dish.extras.find(extra => extra.name === name)?.price_clp ?? 0), 0)) * line.qty;
+  ((line.dish.price_clp ?? 0) + line.extras.reduce((sum, name) => {
+    const extra = line.dish.extras.find(item => item.name === name);
+    return sum + (extra ? extraPrice(line.dish, extra) : 0);
+  }, 0)) * line.qty;
 export const cartTotal = (lines: CartLine[]) => lines.reduce((sum, line) => sum + lineTotal(line), 0);
 export const cartCount = (lines: CartLine[]) => lines.reduce((sum, line) => sum + line.qty, 0);

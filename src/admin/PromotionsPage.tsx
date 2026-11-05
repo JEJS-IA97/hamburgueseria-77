@@ -3,6 +3,7 @@ import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { formatCLP } from '../lib';
 import { Select } from '../components/ui/Select';
+import { ErrorState, LoadingState } from '../components/ui/LoadState';
 
 type Promo = {
   id: string; title: string; description: string; kind: 'weekly' | 'seasonal'; record_type: 'combo' | 'promotion';
@@ -15,13 +16,22 @@ export function PromotionsPage() {
   const [rows, setRows] = useState<Promo[]>([]);
   const [edit, setEdit] = useState<Promo | null>(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [attempt, setAttempt] = useState(0);
 
   async function reload() {
     const { data, error } = await supabase!.from('promotions').select('*').order('created_at', { ascending: false });
     if (error) setError(error.message);
     else setRows((data ?? []) as Promo[]);
   }
-  useEffect(() => { if (supabase) reload(); }, []);
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    if (!supabase) { setError('Supabase no está configurado.'); setLoading(false); return; }
+    reload().catch(() => { if (active) setError('No se pudieron cargar las promociones desde el servidor.'); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [attempt]);
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,7 +72,7 @@ export function PromotionsPage() {
         </div>
         <button className="btn btn-primary" onClick={() => setEdit(emptyPromo())}><Plus size={18} /> Nueva oferta</button>
       </div>
-      {error && <p className="alert">{error}</p>}
+      {error && <ErrorState message={error} onRetry={() => setAttempt(value => value + 1)} />}
 
       {edit && <form key={edit.id || 'new'} className="form-card admin-section" onSubmit={save}>
         <h2>{edit.id ? 'Editar oferta' : 'Nueva oferta'}</h2>
@@ -92,7 +102,7 @@ export function PromotionsPage() {
         </div>
       </form>}
 
-      <ul className="admin-list">
+      {loading ? <LoadingState label="Cargando promociones…" /> : !error && rows.length === 0 ? <p className="empty-state">No hay promociones guardadas.</p> : !error && <ul className="admin-list">
         {rows.map(promo => <li className="admin-row admin-row--promo" key={promo.id}>
           <span className="admin-row__main">
             <b className="truncate">{promo.title}</b>
@@ -104,7 +114,7 @@ export function PromotionsPage() {
             <button className="icon-btn admin-danger" onClick={() => remove(promo)} aria-label={`Eliminar ${promo.title}`}><Trash2 size={18} /></button>
           </span>
         </li>)}
-      </ul>
+      </ul>}
     </section>
   );
 }

@@ -4,6 +4,7 @@ import { type Dish } from '../data';
 import { getDishes } from '../api/catalog';
 import { CategoryNav, CategorySection } from '../components/menu/CategorySection';
 import { PromotionSection, type Promotion } from '../components/menu/PromotionSection';
+import { ErrorState, LoadingState } from '../components/ui/LoadState';
 import { supabase } from '../lib/supabase';
 
 const categoryOrder = ['Hamburguesas', 'Completos', 'Pizzas', 'Sándwiches', 'As', 'Bowls', 'Menú saludable', 'Bebidas', 'Mechadas', 'Pepitos', 'Chorrillanas', 'Frituras', 'Pollo Crispy', 'Cafetería'];
@@ -17,15 +18,27 @@ const anchorFor = (name: string) => `categoria-${normalize(name).replace(/[^a-z0
 export function Home() {
   const [menu, setMenu] = useState<Dish[]>([]);
   const [promotions, setPromotions] = useState<Promotion[]>([]);
+  const [menuStatus, setMenuStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [promotionStatus, setPromotionStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [attempt, setAttempt] = useState(0);
   const address = storeAddress;
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
   useEffect(() => {
-    getDishes().then(setMenu).catch(() => setMenu([]));
-    if (supabase) {
-      supabase.from('promotions').select('id,title,description,kind,record_type,price_clp,components,payment_conditions').eq('active', true).then(({ data }) => setPromotions((data ?? []) as Promotion[]));
-    }
-  }, []);
+    let active = true;
+    setMenuStatus('loading');
+    setPromotionStatus('loading');
+    getDishes().then(data => { if (active) { setMenu(data); setMenuStatus('ready'); } })
+      .catch(() => { if (active) setMenuStatus('error'); });
+    if (!supabase) setPromotionStatus('error');
+    else Promise.resolve(supabase.from('promotions').select('id,title,description,kind,record_type,price_clp,components,payment_conditions').eq('active', true))
+      .then(({ data, error }) => {
+        if (!active) return;
+        if (error) setPromotionStatus('error');
+        else { setPromotions((data ?? []) as Promotion[]); setPromotionStatus('ready'); }
+      }).catch(() => { if (active) setPromotionStatus('error'); });
+    return () => { active = false; };
+  }, [attempt]);
 
   const available = useMemo(() => menu.filter(dish => dish.available), [menu]);
   const promoNames = useMemo(() => new Set(promotions.map(promo => normalize(promo.title))), [promotions]);
@@ -79,13 +92,15 @@ export function Home() {
         <CategoryNav categories={categoryLinks} />
       </div>
 
-      {homeCategoryLinks.map(({ name, anchor }) => {
+      {menuStatus === 'loading' && <LoadingState label="Cargando el menú…" />}
+      {menuStatus === 'error' && <div className="container"><ErrorState message="No pudimos cargar el menú desde el servidor." onRetry={() => setAttempt(value => value + 1)} /></div>}
+      {menuStatus === 'ready' && homeCategoryLinks.map(({ name, anchor }) => {
         const dishes = catalogDishes.filter(dish => normalize(dish.category) === normalize(name));
         return <CategorySection key={name} name={name} anchor={anchor} dishes={dishes} />;
       })}
-      {available.length === 0 && <p className="empty-state section">No hay platos disponibles para mostrar.</p>}
+      {menuStatus === 'ready' && available.length === 0 && <p className="empty-state section container">No hay platos disponibles en el menú todavía.</p>}
 
-      <PromotionSection promotions={promotions} />
+      <PromotionSection promotions={promotions} status={promotionStatus} onRetry={() => setAttempt(value => value + 1)} />
 
       <section className="section" id="ubicacion" aria-labelledby="ubicacion-title">
         <div className="location">

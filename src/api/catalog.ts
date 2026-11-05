@@ -1,8 +1,8 @@
-import type { Dish } from '../data';
+import { extraPrice, type Dish } from '../data';
 import { supabase } from '../lib/supabase';
 
 export async function getDishes():Promise<Dish[]>{
-  if(!supabase)return [];
+  if(!supabase)throw new Error('Supabase no está configurado.');
   const {data,error}=await supabase.from('dishes').select('*, dish_ingredients(ingredients(name)), dish_extra_ingredients(price_clp,is_included,ingredients(name))').order('name');
   if(error)throw error;
   return (data??[]).map((d:any)=>({...d,category:d.category_name??d.category,
@@ -40,7 +40,7 @@ export async function saveDish(d:Dish){
   const baseLinks=names.map(name=>({dish_id:d.id,ingredient_id:byName.get(ingredientSlug(name))})).filter(x=>x.ingredient_id);
   if(baseLinks.length){const {error}=await supabase.from('dish_ingredients').insert(baseLinks);if(error)throw error;}
   await supabase.from('dish_extra_ingredients').delete().eq('dish_id',d.id);
-  const extraLinks=d.extras.map(extra=>({dish_id:d.id,ingredient_id:byName.get(ingredientSlug(extra.name)),price_clp:extra.price_clp,is_included:extra.is_included??false})).filter(x=>x.ingredient_id);
+  const extraLinks=d.extras.map(extra=>({dish_id:d.id,ingredient_id:byName.get(ingredientSlug(extra.name)),price_clp:extraPrice(d,extra),is_included:extra.is_included??false})).filter(x=>x.ingredient_id);
   if(extraLinks.length){const {error}=await supabase.from('dish_extra_ingredients').insert(extraLinks);if(error)throw error;}
 }
 

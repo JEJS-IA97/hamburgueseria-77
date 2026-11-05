@@ -97,7 +97,7 @@
 /* Barra de compra: fija abajo en móvil; en escritorio flota al pie de la columna mientras eliges extras. */
 .dish-purchase-bar {
   position: sticky; bottom: 0; z-index: 10;
-  display: flex; align-items: center; gap: 12px;
+  display: flex; align-items: center; gap: 8px;
   margin-inline: calc(var(--gutter) * -1); padding: 12px var(--gutter) calc(12px + env(safe-area-inset-bottom));
   background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(10px);
   border-top: 1px solid var(--line);
@@ -109,8 +109,23 @@
     background: color-mix(in srgb, var(--surface) 92%, transparent); box-shadow: var(--shadow);
   }
 }
-.dish-purchase-button { flex: 1; min-height: 52px; }
-.dish-purchase-button strong { display: inline-flex; align-items: center; font-size: 17px; }
+.dish-purchase-bar > .stepper { min-width: 0; }
+.dish-purchase-bar > .stepper button { width: 44px; height: 44px; }
+.dish-purchase-bar > .stepper span { min-width: 20px; }
+.dish-purchase-button {
+  flex: 1; min-width: 0; min-height: 52px; justify-content: center; gap: 8px;
+  padding-inline: 12px; font-size: 14px; white-space: nowrap;
+}
+.dish-purchase-button > span { overflow: hidden; text-overflow: ellipsis; }
+.dish-purchase-button strong { display: inline-flex; align-items: center; flex: none; font-size: 16px; }
+@media (min-width: 600px) and (max-width: 899px) {
+  .dish-purchase-bar { gap: 12px; }
+  .dish-purchase-button { padding-inline: 18px; font-size: 15px; }
+  .dish-purchase-button strong { font-size: 17px; }
+}
+@media (min-width: 900px) {
+  .dish-purchase-button { justify-content: space-between; padding-inline: 22px; font-size: 15px; }
+}
 
 /* ── Checkout (ref-3) ──────────────────────────────────────── */
 .checkout { display: grid; gap: 28px; margin-top: 8px; }

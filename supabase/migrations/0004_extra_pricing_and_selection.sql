@@ -22,9 +22,9 @@ set price_clp = case
     and translate(lower(i.name), 'áéíóúüñ', 'aeiouun') ~ 'tocino|camaron|queso|carne|pollo' then 4000
   else 1500
 end
-from public.dishes d
-join public.ingredients i on i.id = ei.ingredient_id
-where d.id = ei.dish_id;
+from public.dishes d, public.ingredients i
+where d.id = ei.dish_id
+  and i.id = ei.ingredient_id;
 
 -- Permite registrar combos del catálogo de promociones y aplicar los precios
 -- actualizados de ingredientes extra al total validado por el servidor.

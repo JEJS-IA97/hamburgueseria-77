@@ -14,8 +14,8 @@
   position: relative; display: block; aspect-ratio: 1; overflow: hidden;
   border-radius: calc(var(--radius-card) - 6px); background: var(--surface-2);
 }
-.dish-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease-out); }
-.dish-card:hover .dish-card__media img { transform: scale(1.05); }
+.dish-card__media img { width: 100%; height: 100%; object-fit: contain; padding: 4px; transition: transform 0.5s var(--ease-out); }
+.dish-card:hover .dish-card__media img { transform: scale(1.04); }
 .dish-card__placeholder { display: grid; place-items: center; width: 100%; height: 100%; color: color-mix(in srgb, var(--text-muted) 55%, transparent); }
 
 .dish-card__body { display: grid; grid-template-rows: auto auto 1fr; gap: 2px; min-width: 0; padding: 12px 6px 4px; }

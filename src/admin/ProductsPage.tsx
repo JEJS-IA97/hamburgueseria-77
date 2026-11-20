@@ -158,32 +158,29 @@ export function ProductsPage() {
           <label className="field"><span>Ingredientes</span><textarea className="input" name="ingredients" defaultValue={edit.ingredients.join(', ')} /><small>Separados por coma.</small></label>
           <label className="field"><span>Componentes incluidos</span><textarea className="input" name="components" defaultValue={(edit.components ?? []).join('\n')} /><small>Uno por línea.</small></label>
           <label className="field"><span>Extras</span><textarea className="input" name="extras" defaultValue={edit.extras.map(x => `${x.name}:${x.price_clp}:${x.is_included ?? false}`).join('\n')} /><small>Uno por línea: nombre:precio:incluido (true/false).</small></label>
-          <div className="form-row">
-            <label className="field"><span>Selecciones requeridas</span><input className="input" type="number" min="0" name="extra_selection_limit" defaultValue={edit.extra_selection_limit ?? 0} /><small>0 si no aplica.</small></label>
-            <div className="field">
-              <span>Fotografía del plato</span>
-              <div className="admin-image-upload">
-                {edit.image ? (
-                  <div className="admin-image-preview">
-                    <img src={imageUrl(edit.image, 200)} alt="" className="admin-image-preview__img" />
-                    <button type="button" className="icon-btn admin-image-preview__remove" onClick={() => setEdit({ ...edit, image: '' })} aria-label="Quitar imagen" title="Quitar imagen">
-                      <X size={16} />
-                    </button>
-                    <label className="btn btn-outline btn-sm admin-image-preview__change" title="Cambiar imagen">
-                      <ImagePlus size={14} aria-hidden="true" /> {uploading ? 'Subiendo…' : 'Cambiar'}
-                      <input type="file" accept="image/*" className="sr-only" disabled={uploading || saving} onChange={(e) => onUploadImage(e.target.files)} />
-                    </label>
-                  </div>
-                ) : (
-                  <label className="admin-images__add">
-                    <ImagePlus size={24} aria-hidden="true" />
-                    <span>{uploading ? 'Subiendo imagen…' : 'Subir imagen'}</span>
+          <div className="field">
+            <span>Fotografía del plato</span>
+            <div className="admin-image-upload">
+              {edit.image ? (
+                <div className="admin-image-preview">
+                  <img src={imageUrl(edit.image, 200)} alt="" className="admin-image-preview__img" />
+                  <button type="button" className="icon-btn admin-image-preview__remove" onClick={() => setEdit({ ...edit, image: '' })} aria-label="Quitar imagen" title="Quitar imagen">
+                    <X size={16} />
+                  </button>
+                  <label className="btn btn-outline btn-sm admin-image-preview__change" title="Cambiar imagen">
+                    <ImagePlus size={14} aria-hidden="true" /> {uploading ? 'Subiendo…' : 'Cambiar'}
                     <input type="file" accept="image/*" className="sr-only" disabled={uploading || saving} onChange={(e) => onUploadImage(e.target.files)} />
                   </label>
-                )}
-              </div>
-              <small>{edit.image ? 'Foto lista. Se optimiza a WebP y se guarda al confirmar.' : 'Sube una foto desde tu equipo. Se optimiza a WebP automáticamente.'}</small>
+                </div>
+              ) : (
+                <label className="admin-images__add">
+                  <ImagePlus size={24} aria-hidden="true" />
+                  <span>{uploading ? 'Subiendo imagen…' : 'Subir imagen'}</span>
+                  <input type="file" accept="image/*" className="sr-only" disabled={uploading || saving} onChange={(e) => onUploadImage(e.target.files)} />
+                </label>
+              )}
             </div>
+            <small>{edit.image ? 'Foto lista. Se optimiza a WebP y se guarda al confirmar.' : 'Sube una foto desde tu equipo. Se optimiza a WebP automáticamente.'}</small>
           </div>
           <label className="check"><input type="checkbox" name="available" defaultChecked={edit.available} /> Disponible</label>
           {error && <p className="alert">{error}</p>}

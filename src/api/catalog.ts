@@ -25,6 +25,7 @@ export async function saveDish(d:Dish){
   if(categoryError)throw categoryError;
   const payload:any={...d,category_id:category.id,category_name:d.category};
   delete payload.category;delete payload.extras;
+  delete payload.dish_ingredients;delete payload.dish_extra_ingredients;
   const {error}=await supabase.from('dishes').upsert(payload);if(error)throw error;
 
   const names=[...new Set(d.ingredients)];

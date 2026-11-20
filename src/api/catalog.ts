@@ -1,5 +1,6 @@
 import { extraPrice, type Dish } from '../data';
 import { supabase } from '../lib/supabase';
+import { uploadProductImage } from '../admin/image';
 
 export async function getDishes():Promise<Dish[]>{
   if(!supabase)throw new Error('Supabase no está configurado.');
@@ -45,4 +46,6 @@ export async function saveDish(d:Dish){
 }
 
 export async function deleteDish(id:string){if(!supabase)throw new Error('Configura Supabase para guardar cambios.');const {error}=await supabase.from('dishes').delete().eq('id',id);if(error)throw error;}
-export async function uploadDishImage(file:File){if(!supabase)throw new Error('Configura Supabase para subir imágenes.');const path=`${crypto.randomUUID()}-${file.name.replace(/[^\w.-]/g,'_')}`;const {error}=await supabase.storage.from('dish-images').upload(path,file,{upsert:false,contentType:file.type});if(error)throw error;return supabase.storage.from('dish-images').getPublicUrl(path).data.publicUrl;}
+export async function uploadDishImage(file: File, slug = 'plato'): Promise<string> {
+  return uploadProductImage(file, slug);
+}

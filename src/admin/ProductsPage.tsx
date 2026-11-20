@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
-import { Pencil, Plus, Search, Trash2, X } from 'lucide-react';
+import { ImagePlus, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import { imageUrl, type Dish } from '../data';
-import { deleteDish, getCategories, getDishes, saveDish } from '../api/catalog';
+import { deleteDish, getCategories, getDishes, saveDish, uploadDishImage } from '../api/catalog';
 import { formatDishPrice } from '../lib';
 import { Select } from '../components/ui/Select';
 import { ErrorState, LoadingState } from '../components/ui/LoadState';
@@ -17,6 +17,7 @@ export function ProductsPage() {
   const [edit, setEdit] = useState<Dish | null>(null);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [attempt, setAttempt] = useState(0);
   const [query, setQuery] = useState('');
@@ -53,7 +54,7 @@ export function ProductsPage() {
       description: String(f.get('description')),
       ingredients: String(f.get('ingredients')).split(',').map(x => x.trim()).filter(Boolean),
       price_clp: f.get('price') ? Number(f.get('price')) : null,
-      image: String(f.get('image')),
+      image: edit?.image ?? '',
       components: String(f.get('components')).split('\n').map(x => x.trim()).filter(Boolean),
       extra_selection_limit: Number(f.get('extra_selection_limit')) || 0,
       extras: String(f.get('extras')).split('\n').filter(Boolean).map(line => {
@@ -79,6 +80,20 @@ export function ProductsPage() {
     if (!confirm(`¿Eliminar ${dish.name}${dish.size ? ` ${dish.size}` : ''}?`)) return;
     await deleteDish(dish.id);
     reload();
+  }
+
+  async function onUploadImage(files: FileList | null) {
+    if (!files?.length || !edit) return;
+    setUploading(true);
+    setError('');
+    try {
+      const url = await uploadDishImage(files[0], edit.name || 'plato');
+      setEdit({ ...edit, image: url });
+    } catch (x) {
+      setError(x instanceof Error ? x.message : 'No se pudo subir la imagen');
+    } finally {
+      setUploading(false);
+    }
   }
 
   return (
@@ -145,12 +160,35 @@ export function ProductsPage() {
           <label className="field"><span>Extras</span><textarea className="input" name="extras" defaultValue={edit.extras.map(x => `${x.name}:${x.price_clp}:${x.is_included ?? false}`).join('\n')} /><small>Uno por línea: nombre:precio:incluido (true/false).</small></label>
           <div className="form-row">
             <label className="field"><span>Selecciones requeridas</span><input className="input" type="number" min="0" name="extra_selection_limit" defaultValue={edit.extra_selection_limit ?? 0} /><small>0 si no aplica.</small></label>
-            <label className="field"><span>Imagen</span><input className="input" name="image" defaultValue={edit.image} placeholder="URL o identificador" /></label>
+            <div className="field">
+              <span>Fotografía del plato</span>
+              <div className="admin-image-upload">
+                {edit.image ? (
+                  <div className="admin-image-preview">
+                    <img src={imageUrl(edit.image, 200)} alt="" className="admin-image-preview__img" />
+                    <button type="button" className="icon-btn admin-image-preview__remove" onClick={() => setEdit({ ...edit, image: '' })} aria-label="Quitar imagen" title="Quitar imagen">
+                      <X size={16} />
+                    </button>
+                    <label className="btn btn-outline btn-sm admin-image-preview__change" title="Cambiar imagen">
+                      <ImagePlus size={14} aria-hidden="true" /> {uploading ? 'Subiendo…' : 'Cambiar'}
+                      <input type="file" accept="image/*" className="sr-only" disabled={uploading || saving} onChange={(e) => onUploadImage(e.target.files)} />
+                    </label>
+                  </div>
+                ) : (
+                  <label className="admin-images__add">
+                    <ImagePlus size={24} aria-hidden="true" />
+                    <span>{uploading ? 'Subiendo imagen…' : 'Subir imagen'}</span>
+                    <input type="file" accept="image/*" className="sr-only" disabled={uploading || saving} onChange={(e) => onUploadImage(e.target.files)} />
+                  </label>
+                )}
+              </div>
+              <small>{edit.image ? 'Foto lista. Se optimiza a WebP y se guarda al confirmar.' : 'Sube una foto desde tu equipo. Se optimiza a WebP automáticamente.'}</small>
+            </div>
           </div>
           <label className="check"><input type="checkbox" name="available" defaultChecked={edit.available} /> Disponible</label>
           {error && <p className="alert">{error}</p>}
           <div className="admin-dialog__actions">
-            <button className="btn btn-primary" disabled={saving}>{saving ? 'Guardando…' : 'Guardar'}</button>
+            <button className="btn btn-primary" disabled={saving || uploading}>{saving ? 'Guardando…' : uploading ? 'Subiendo…' : 'Guardar'}</button>
             <button type="button" className="btn btn-outline" onClick={() => setEdit(null)}>Cancelar</button>
           </div>
         </form>}

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { formatCLP } from '../lib';
+import { PAYMENT_LABELS } from '../api/orders';
 import { Select } from '../components/ui/Select';
 import { ErrorState, LoadingState } from '../components/ui/LoadState';
 
@@ -76,8 +77,26 @@ export function OrdersPage() {
                 <dl className="order__data">
                   <dt>Teléfono</dt><dd><a href={`tel:${order.customer_phone}`}>{order.customer_phone}</a></dd>
                   <dt>RUT</dt><dd>{order.customer_rut}</dd>
-                  <dt>Entrega</dt><dd>{order.mode === 'delivery' ? order.address : order.mode === 'table' ? `Mesa ${order.table_number}` : 'Retiro en local'}</dd>
-                  {order.notes && <><dt>Notas</dt><dd>{order.notes}</dd></>}
+                  <dt>Entrega</dt>
+                  <dd>
+                    {order.mode === 'delivery'
+                      ? `🛵 Delivery · ${order.address ?? 'Sin dirección'}`
+                      : order.mode === 'table'
+                      ? `🍽️ Mesa ${order.table_number ?? 's/n'}`
+                      : '🛍️ Retiro en local (Pick up)'}
+                  </dd>
+                  <dt>Forma de pago</dt>
+                  <dd>
+                    {order.payment_method
+                      ? (PAYMENT_LABELS[order.payment_method as keyof typeof PAYMENT_LABELS] || order.payment_method)
+                      : (order.notes?.match(/\[Pago:\s*([^\]]+)\]/)?.[1] || 'No especificado')}
+                  </dd>
+                  {order.notes && (
+                    <>
+                      <dt>Notas</dt>
+                      <dd>{order.notes.replace(/\[(Pago|Entrega):[^\]]+\]\s*/g, '').trim() || order.notes}</dd>
+                    </>
+                  )}
                 </dl>
                 <ul className="order__items">
                   {items.map((item, index) => <li key={`${item.name}-${index}`}>

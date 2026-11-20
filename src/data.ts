@@ -1,3 +1,5 @@
+import { supabase } from './lib/supabase';
+
 export type Category=string;
 export type Dish={
  id:string;name:string;category:Category;description:string;ingredients:string[];price_clp:number|null;price_min_clp?:number|null;price_max_clp?:number|null;image:string;
@@ -5,7 +7,14 @@ export type Dish={
  product_type?:'dish'|'combo';components?:string[];payment_conditions?:string;extra_selection_limit?:number;sales_days?:string[];
 };
 
-export const imageUrl=(id:string,width=720)=>/^https?:\/\//.test(id)?id:id?`https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=85`:'';
+export const imageUrl = (id: string, width = 720) => {
+  if (!id) return '';
+  if (/^https?:\/\//.test(id) || id.startsWith('/')) return id;
+  if (id.includes('/') || id.endsWith('.webp')) {
+    return supabase ? supabase.storage.from('products').getPublicUrl(id).data.publicUrl : id;
+  }
+  return `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=85`;
+};
 
 const normalizeExtraLabel = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es');
 
